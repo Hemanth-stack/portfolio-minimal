@@ -1,6 +1,6 @@
 from datetime import datetime
 from fastapi import APIRouter, Request, Depends, Form, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, FileResponse, Response
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, extract
@@ -362,6 +362,15 @@ async def download_resume():
     raise HTTPException(status_code=404, detail="Resume PDF not found")
 
 
+# ============ Services ============
+
+@router.get("/services", response_class=HTMLResponse)
+async def services(request: Request, db: AsyncSession = Depends(get_db)):
+    """Services/Hire Me page."""
+    ctx = await common_context(request, db)
+    return templates.TemplateResponse("services.html", ctx)
+
+
 @router.get("/contact", response_class=HTMLResponse)
 async def contact(request: Request, db: AsyncSession = Depends(get_db)):
     ctx = await common_context(request, db)
@@ -668,14 +677,19 @@ async def blog_post(request: Request, slug: str, db: AsyncSession = Depends(get_
         return RedirectResponse("/blog")
     
     comments = [c for c in post.comments if c.approved]
+
+    post_content = render_markdown(post.content)
+    estimate_read_time_val = estimate_read_time(post.content)
     
-    return templates.TemplateResponse("blog/post.html", {
+    render_template = templates.TemplateResponse("blog/post.html", {
         **ctx,
         "post": post,
-        "content": render_markdown(post.content),
-        "read_time": estimate_read_time(post.content),
+        "content": post_content,
+        "read_time": estimate_read_time_val,
         "comments": comments,
     })
+
+    return render_template
 
 
 @router.post("/blog/{slug}/comment")
@@ -738,3 +752,82 @@ async def project_detail(request: Request, slug: str, db: AsyncSession = Depends
         "project": project,
         "content": render_markdown(project.description),
     })
+
+
+# ============ SEO Routes ============
+
+@router.get("/robots.txt")
+async def robots_txt():
+    """Serve robots.txt for search engines."""
+    settings = get_settings()
+    content = f"""# robots.txt for {settings.site_url}
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: {settings.site_url}/sitemap.xml
+
+# Disallow admin pages
+Disallow: /admin/
+"""
+    return Response(content=content, media_type="text/plain")
+
+
+@router.get("/sitemap.xml")
+async def sitemap_xml(db: AsyncSession = Depends(get_db)):
+    """Generate dynamic sitemap.xml for search engines."""
+    settings = get_settings()
+    base_url = settings.site_url
+    
+    # Static pages
+    pages = [
+        {"loc": "/", "priority": "1.0", "changefreq": "weekly"},
+        {"loc": "/services", "priority": "0.95", "changefreq": "weekly"},
+        {"loc": "/blog", "priority": "0.9", "changefreq": "daily"},
+        {"loc": "/projects", "priority": "0.8", "changefreq": "weekly"},
+        {"loc": "/about", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": "/contact", "priority": "0.6", "changefreq": "monthly"},
+    ]
+    
+    # Get all published blog posts
+    result = await db.execute(
+        select(Post).where(Post.published == True).order_by(Post.created_at.desc())
+    )
+    posts = result.scalars().all()
+    
+    # Get all projects
+    result = await db.execute(select(Project))
+    projects = result.scalars().all()
+    
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    
+    # Add static pages
+    for page in pages:
+        xml += f'  <url>\n'
+        xml += f'    <loc>{base_url}{page["loc"]}</loc>\n'
+        xml += f'    <changefreq>{page["changefreq"]}</changefreq>\n'
+        xml += f'    <priority>{page["priority"]}</priority>\n'
+        xml += f'  </url>\n'
+    
+    # Add blog posts
+    for post in posts:
+        lastmod = post.updated_at or post.created_at
+        xml += f'  <url>\n'
+        xml += f'    <loc>{base_url}/blog/{post.slug}</loc>\n'
+        xml += f'    <lastmod>{lastmod.strftime("%Y-%m-%d")}</lastmod>\n'
+        xml += f'    <changefreq>monthly</changefreq>\n'
+        xml += f'    <priority>0.8</priority>\n'
+        xml += f'  </url>\n'
+    
+    # Add projects
+    for project in projects:
+        xml += f'  <url>\n'
+        xml += f'    <loc>{base_url}/projects/{project.slug}</loc>\n'
+        xml += f'    <changefreq>monthly</changefreq>\n'
+        xml += f'    <priority>0.6</priority>\n'
+        xml += f'  </url>\n'
+    
+    xml += '</urlset>'
+    
+    return Response(content=xml, media_type="application/xml")

@@ -22,6 +22,17 @@
     <meta name="twitter:title" content="{% block twitter_title %}{{ site.site_name }}{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}{{ site.site_tagline }}{% endblock %}">
     
+    <!-- Google Analytics - Replace GA_MEASUREMENT_ID with your ID -->
+    {% if not is_admin %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    {% endif %}
+    
     <link rel="stylesheet" href="/static/style.css">
     {% block head %}{% endblock %}
 </head>
@@ -30,11 +41,10 @@
         <nav>
             <a href="/" class="site-title">{{ site.site_name }}</a>
             <div class="nav-links">
+                <a href="/services">services</a>
                 <a href="/blog">blog</a>
                 <a href="/projects">projects</a>
-                <a href="/now">now</a>
                 <a href="/about">about</a>
-                <a href="/resume">resume</a>
                 <a href="/contact">contact</a>
             </div>
         </nav>

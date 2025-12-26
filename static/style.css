@@ -744,3 +744,161 @@ hr {
 .share-buttons a {
     margin-right: 1rem;
 }
+
+/* ================================
+   Services Page
+   ================================ */
+
+.services-page .intro {
+    font-size: 1.1rem;
+    color: var(--fg-muted);
+    margin-bottom: 2rem;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.service-card {
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 8px;
+    position: relative;
+}
+
+.service-card.featured {
+    border-color: var(--link);
+    border-width: 2px;
+}
+
+.service-card .badge {
+    position: absolute;
+    top: -10px;
+    left: 1rem;
+    background: var(--link);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.service-card h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.service-card ul {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.service-card li {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.service-card .price {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+    color: var(--fg);
+}
+
+.process {
+    margin-bottom: 3rem;
+}
+
+.process-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.step {
+    text-align: center;
+}
+
+.step-num {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    background: var(--link);
+    color: white;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+}
+
+.step h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.step p {
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+}
+
+.cta-section {
+    text-align: center;
+    padding: 2rem;
+    background: var(--code-bg);
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.cta-section h2 {
+    margin-top: 0;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--link);
+    color: white;
+}
+
+.btn-primary:visited {
+    color: white;
+}
+
+.btn-secondary {
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--fg);
+}
+
+.faq {
+    margin-top: 2rem;
+}
+
+.faq details {
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+}
+
+.faq summary {
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.faq p {
+    margin-top: 0.5rem;
+    color: var(--fg-muted);
+}

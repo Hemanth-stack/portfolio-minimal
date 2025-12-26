@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Services – {{ site.site_name }}{% endblock %}
+{% block description %}AI/ML consulting, MLOps implementation, and custom AI solutions. Hire Hemanth for your next project.{% endblock %}
+
+{% block content %}
+<div class="services-page">
+    <h1>Services</h1>
+    
+    <p class="intro">I help startups and enterprises build production-ready AI systems that scale. From strategy to deployment.</p>
+    
+    <section class="services-grid">
+        <div class="service-card">
+            <h2>🤖 AI/ML Consulting</h2>
+            <p>Strategic guidance on AI adoption, model selection, and architecture design for your specific use case.</p>
+            <ul>
+                <li>AI readiness assessment</li>
+                <li>Model selection & architecture</li>
+                <li>Technical due diligence</li>
+                <li>Team training & mentorship</li>
+            </ul>
+            <p class="price">Starting at <strong>$2,500</strong>/engagement</p>
+        </div>
+        
+        <div class="service-card featured">
+            <span class="badge">Most Popular</span>
+            <h2>⚙️ MLOps Implementation</h2>
+            <p>End-to-end ML pipeline setup with CI/CD, monitoring, and automated retraining.</p>
+            <ul>
+                <li>ML pipeline architecture</li>
+                <li>Model versioning & registry</li>
+                <li>Automated training & deployment</li>
+                <li>Monitoring & alerting</li>
+                <li>Infrastructure as code</li>
+            </ul>
+            <p class="price">Starting at <strong>$5,000</strong>/project</p>
+        </div>
+        
+        <div class="service-card">
+            <h2>🚀 Custom AI Solutions</h2>
+            <p>Full-stack AI application development from prototype to production.</p>
+            <ul>
+                <li>LLM-powered applications</li>
+                <li>RAG systems & chatbots</li>
+                <li>Computer vision solutions</li>
+                <li>Recommendation engines</li>
+                <li>API development & integration</li>
+            </ul>
+            <p class="price">Starting at <strong>$8,000</strong>/project</p>
+        </div>
+        
+        <div class="service-card">
+            <h2>📅 Retainer / Fractional CTO</h2>
+            <p>Ongoing technical leadership for your AI initiatives. Part-time commitment, full-time expertise.</p>
+            <ul>
+                <li>Weekly strategy sessions</li>
+                <li>Architecture reviews</li>
+                <li>Team mentorship</li>
+                <li>Vendor evaluation</li>
+                <li>Priority support</li>
+            </ul>
+            <p class="price"><strong>$5,000 - $10,000</strong>/month</p>
+        </div>
+    </section>
+    
+    <section class="process">
+        <h2>How I Work</h2>
+        <div class="process-steps">
+            <div class="step">
+                <span class="step-num">1</span>
+                <h3>Discovery Call</h3>
+                <p>30-min call to understand your goals, challenges, and timeline.</p>
+            </div>
+            <div class="step">
+                <span class="step-num">2</span>
+                <h3>Proposal</h3>
+                <p>Detailed scope, timeline, and fixed-price quote within 48 hours.</p>
+            </div>
+            <div class="step">
+                <span class="step-num">3</span>
+                <h3>Execution</h3>
+                <p>Weekly updates, transparent communication, iterative delivery.</p>
+            </div>
+            <div class="step">
+                <span class="step-num">4</span>
+                <h3>Handoff</h3>
+                <p>Documentation, training, and 30-day support included.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta-section">
+        <h2>Ready to Build Something Great?</h2>
+        <p>Let's discuss your project. I typically respond within 24 hours.</p>
+        <div class="cta-buttons">
+            <a href="/contact" class="btn btn-primary">Get in Touch</a>
+            <a href="https://calendly.com/ihemanth-2001/30min" class="btn btn-secondary" target="_blank" rel="noopener">Schedule a Call</a>
+        </div>
+    </section>
+    
+    <section class="faq">
+        <h2>Frequently Asked Questions</h2>
+        
+        <details>
+            <summary>What's your typical project timeline?</summary>
+            <p>Most projects take 4-12 weeks depending on complexity. I'll provide a detailed timeline in the proposal.</p>
+        </details>
+        
+        <details>
+            <summary>Do you work with early-stage startups?</summary>
+            <p>Yes! I offer flexible arrangements for startups, including equity + reduced rate options for promising projects.</p>
+        </details>
+        
+        <details>
+            <summary>What technologies do you work with?</summary>
+            <p>Python, PyTorch, TensorFlow, LangChain, FastAPI, Docker, Kubernetes, AWS/GCP/Azure, and more. I'm tool-agnostic and choose what's best for your use case.</p>
+        </details>
+        
+        <details>
+            <summary>Do you offer ongoing support?</summary>
+            <p>All projects include 30 days of support. For long-term needs, consider a retainer arrangement.</p>
+        </details>
+        
+        <details>
+            <summary>What's your payment structure?</summary>
+            <p>Typically 50% upfront, 50% on completion. For larger projects, we can arrange milestone-based payments.</p>
+        </details>
+    </section>
+</div>
+
+{% if is_admin %}
+<div class="admin-note">
+    <p><strong>Admin:</strong> Update pricing and services in <code>app/templates/services.html</code></p>
+</div>
+{% endif %}
+{% endblock %}
