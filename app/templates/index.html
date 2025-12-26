@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% from "macros/editor.html" import editable_section, pencil_icon, add_section_controls %}
+
+{% block title %}{{ site.site_name }} – {{ site.site_tagline }}{% endblock %}
+
+{% block content %}
+{# Hero Section #}
+{% if sections.hero %}
+<div class="editable-section" 
+     data-section-id="{{ sections.hero.section.id }}"
+     data-page="home"
+     data-section-key="hero">
+    {% if is_admin %}
+    <button type="button" class="edit-section-btn" title="Edit section">
+        {{ pencil_icon() }}
+    </button>
+    {% endif %}
+    <div class="section-content">
+        {{ sections.hero.html | safe }}
+    </div>
+</div>
+{% endif %}
+
+{# What I Do Section #}
+{% if sections.what_i_do %}
+<div class="editable-section" 
+     data-section-id="{{ sections.what_i_do.section.id }}"
+     data-page="home"
+     data-section-key="what_i_do">
+    {% if is_admin %}
+    <button type="button" class="edit-section-btn" title="Edit section">
+        {{ pencil_icon() }}
+    </button>
+    {% endif %}
+    <div class="section-content">
+        {{ sections.what_i_do.html | safe }}
+    </div>
+</div>
+{% endif %}
+
+{# Recent Writing - Auto-generated #}
+<h2>Recent writing</h2>
+{% if recent_posts %}
+<ul class="post-list">
+    {% for post in recent_posts[:3] %}
+    <li>
+        <span class="post-meta">{{ post.created_at.strftime('%b %d, %Y') }}</span>
+        <a href="/blog/{{ post.slug }}" class="post-title">{{ post.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+<p><a href="/blog">View all posts →</a></p>
+{% else %}
+<p class="muted">No posts yet. Check back soon!</p>
+{% endif %}
+
+{# Featured Projects - Auto-generated #}
+<h2>Featured projects</h2>
+{% if featured_projects %}
+{% for project in featured_projects[:2] %}
+<div class="project-card">
+    <h3 class="project-title"><a href="/projects/{{ project.slug }}">{{ project.title }}</a></h3>
+    <p>{{ project.short_description }}</p>
+    {% if project.metrics %}<p class="metric">{{ project.metrics }}</p>{% endif %}
+</div>
+{% endfor %}
+<p><a href="/projects">View all projects →</a></p>
+{% else %}
+<p class="muted">Projects coming soon!</p>
+{% endif %}
+
+{# CTA Section #}
+{% if sections.cta %}
+<div class="editable-section" 
+     data-section-id="{{ sections.cta.section.id }}"
+     data-page="home"
+     data-section-key="cta">
+    {% if is_admin %}
+    <button type="button" class="edit-section-btn" title="Edit section">
+        {{ pencil_icon() }}
+    </button>
+    {% endif %}
+    <div class="section-content">
+        {{ sections.cta.html | safe }}
+    </div>
+</div>
+{% endif %}
+
+{# Admin: Add new section button #}
+{% if is_admin %}
+{{ add_section_controls('home') }}
+{% endif %}
+{% endblock %}

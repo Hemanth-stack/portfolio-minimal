@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: portfolio_web
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://hemanth:password@db:5432/portfolio
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: changeme
+      SECRET_KEY: your-secret-key-here
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: "587"
+      SMTP_USER: ihemanth.2001@gmail.com
+      SMTP_PASSWORD: your-app-password
+      SMTP_FROM: ihemanth.2001@gmail.com
+      SITE_URL: https://iamhemanth.in
+      SITE_NAME: Hemanth Irivichetty
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  db:
+    image: postgres:15-alpine
+    container_name: portfolio_db
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: hemanth
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hemanth"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local

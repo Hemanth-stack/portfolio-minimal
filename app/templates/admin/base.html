@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin{% endblock %} – {{ settings.site_name }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .admin-nav {
+            background: var(--code-bg);
+            padding: 1rem;
+            margin: -2rem -1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        .admin-nav a {
+            color: var(--fg);
+            text-decoration: none;
+        }
+        .admin-nav a:hover {
+            text-decoration: underline;
+        }
+        .admin-nav .spacer {
+            flex-grow: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--code-bg);
+        }
+        .actions a, .actions button {
+            margin-right: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.1rem 0.4rem;
+            font-size: 0.75rem;
+            border-radius: 3px;
+        }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        @media (prefers-color-scheme: dark) {
+            .badge-success { background: #1a3d1a; color: #90ee90; }
+            .badge-warning { background: #3d3d1a; color: #ffff90; }
+            .badge-danger { background: #3d1a1a; color: #ffaaaa; }
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .stat-card {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        .stat-card p {
+            margin: 0.5rem 0 0;
+            color: var(--fg-muted);
+        }
+        #preview {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            min-height: 200px;
+        }
+        .btn-danger {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .inline-form {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+        }
+        .inline-form input {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="admin-nav">
+        <strong>Admin</strong>
+        <a href="/admin">Dashboard</a>
+        <a href="/admin/posts">Posts</a>
+        <a href="/admin/projects">Projects</a>
+        <a href="/admin/pages">Pages</a>
+        <a href="/admin/categories">Categories</a>
+        <a href="/admin/tags">Tags</a>
+        <a href="/admin/comments">Comments</a>
+        <a href="/admin/messages">Messages</a>
+        <span class="spacer"></span>
+        <a href="/" target="_blank">View Site</a>
+        <a href="/admin/logout">Logout</a>
+    </nav>
+    
+    <main>
+        {% if flash_message %}
+        <div class="flash flash-{{ flash_type }}">
+            {{ flash_message }}
+        </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

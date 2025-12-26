@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "macros/editor.html" import pencil_icon, add_section_controls %}
+
+{% block title %}Resume – {{ site.site_name }}{% endblock %}
+{% block description %}Professional resume of {{ site.site_name }} - AI & MLOps Engineer with expertise in LLM inference and RAG systems.{% endblock %}
+
+{% block content %}
+<div class="resume-page">
+    <div class="resume-actions no-print">
+        <a href="/resume/download" class="btn">📄 Download PDF</a>
+    </div>
+
+    {# Render all sections in order #}
+    {% for item in sections_list %}
+    {% set section = item.section %}
+    {% set html = item.html %}
+    
+    <div class="editable-section resume-section{% if not section.visible %} section-hidden{% endif %}" 
+         data-section-id="{{ section.id }}"
+         data-page="resume"
+         data-section-key="{{ section.section_key }}">
+        {% if is_admin %}
+        <button type="button" class="edit-section-btn" title="Edit {{ section.title }}">
+            {{ pencil_icon() }}
+        </button>
+        {% endif %}
+        <div class="section-content">
+            {{ html | safe }}
+        </div>
+    </div>
+    {% endfor %}
+
+    {# Admin: Add new section button #}
+    {% if is_admin %}
+    {{ add_section_controls('resume') }}
+    {% endif %}
+</div>
+{% endblock %}

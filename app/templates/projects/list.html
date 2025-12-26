@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Projects – {{ settings.site_name }}{% endblock %}
+{% block description %}Projects and work by {{ settings.site_name }}, AI & MLOps Engineer.{% endblock %}
+
+{% block content %}
+<h1>Projects</h1>
+
+<p>A selection of work I've done, from LLM inference systems to data pipelines.</p>
+
+{% if projects %}
+{% for project in projects %}
+<div class="project-card">
+    <h2 class="project-title"><a href="/projects/{{ project.slug }}">{{ project.title }}</a></h2>
+    <p>{{ project.short_description }}</p>
+    
+    {% if project.tech_stack %}
+    <div class="tech-stack">
+        {% for tech in project.tech_stack.split(',') %}
+        <span class="tech-badge">{{ tech.strip() }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if project.metrics %}
+    <p class="metric">📈 {{ project.metrics }}</p>
+    {% endif %}
+    
+    <div class="project-links">
+        {% if project.github_url %}<a href="{{ project.github_url }}" rel="noopener">GitHub</a>{% endif %}
+        {% if project.live_url %}<a href="{{ project.live_url }}" rel="noopener">Live Demo</a>{% endif %}
+        <a href="/projects/{{ project.slug }}">Read more →</a>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<p class="muted">Projects coming soon!</p>
+{% endif %}
+{% endblock %}

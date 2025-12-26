@@ -1,0 +1,129 @@
+{# 
+  Macros for editable sections
+  Usage: {{ editable_section(section, is_admin) }}
+#}
+
+{# Pencil icon SVG #}
+{% macro pencil_icon() %}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+</svg>
+{% endmacro %}
+
+{# Render an editable section #}
+{% macro editable_section(section, content_html, is_admin=false) %}
+<div class="editable-section{% if not section.visible %} section-hidden{% endif %}" 
+     data-section-id="{{ section.id }}"
+     data-page="{{ section.page }}"
+     data-section-key="{{ section.section_key }}">
+    {% if is_admin %}
+    <button type="button" class="edit-section-btn" title="Edit section">
+        {{ pencil_icon() }}
+    </button>
+    {% endif %}
+    <div class="section-content">
+        {{ content_html | safe }}
+    </div>
+</div>
+{% endmacro %}
+
+{# Render a simple editable block (for single-section pages) #}
+{% macro editable_block(page, section_key, content_html, section_id, is_admin=false) %}
+<div class="editable-section" 
+     data-section-id="{{ section_id }}"
+     data-page="{{ page }}"
+     data-section-key="{{ section_key }}">
+    {% if is_admin %}
+    <button type="button" class="edit-section-btn" title="Edit section">
+        {{ pencil_icon() }}
+    </button>
+    {% endif %}
+    <div class="section-content">
+        {{ content_html | safe }}
+    </div>
+</div>
+{% endmacro %}
+
+{# Add new section button and modal (admin only) #}
+{% macro add_section_controls(page) %}
+<div class="admin-actions no-print">
+    <button type="button" class="add-section-btn" onclick="showAddSectionModal('{{ page }}')">
+        + Add New Section
+    </button>
+</div>
+
+<div id="add-section-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>Add New Section</h3>
+        <form id="add-section-form">
+            <input type="hidden" id="new-section-page" value="">
+            
+            <label for="new-section-key">Section Key (unique identifier)</label>
+            <input type="text" id="new-section-key" placeholder="e.g., certifications" required>
+            <small class="help-text">Use lowercase with underscores, e.g., work_experience</small>
+            
+            <label for="new-section-title">Section Title</label>
+            <input type="text" id="new-section-title" placeholder="e.g., Certifications" required>
+            
+            <label for="new-section-content">Content (Markdown)</label>
+            <textarea id="new-section-content" rows="6" placeholder="## Your content here..."></textarea>
+            
+            <label for="new-section-order">Display Order</label>
+            <input type="number" id="new-section-order" value="99" min="0">
+            
+            <div class="modal-actions">
+                <button type="submit" class="btn">Create Section</button>
+                <button type="button" class="btn btn-secondary" onclick="hideAddSectionModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showAddSectionModal(page) {
+    document.getElementById('new-section-page').value = page;
+    document.getElementById('add-section-modal').style.display = 'flex';
+}
+
+function hideAddSectionModal() {
+    document.getElementById('add-section-modal').style.display = 'none';
+    document.getElementById('add-section-form').reset();
+}
+
+document.getElementById('add-section-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+        page: document.getElementById('new-section-page').value,
+        section_key: document.getElementById('new-section-key').value,
+        title: document.getElementById('new-section-title').value,
+        content: document.getElementById('new-section-content').value,
+        order: parseInt(document.getElementById('new-section-order').value) || 99,
+    };
+    
+    try {
+        const response = await fetch('/api/section', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        
+        if (response.ok) {
+            hideAddSectionModal();
+            location.reload();
+        } else {
+            const err = await response.json();
+            alert('Error: ' + (err.error || 'Failed to create section'));
+        }
+    } catch (err) {
+        alert('Failed to create section');
+    }
+});
+
+document.getElementById('add-section-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'add-section-modal') {
+        hideAddSectionModal();
+    }
+});
+</script>
+{% endmacro %}

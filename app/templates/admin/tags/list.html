@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Tags{% endblock %}
+
+{% block content %}
+<h1>Tags</h1>
+
+<h2>Add New Tag</h2>
+<form method="POST" action="/admin/tags/new" class="inline-form">
+    <input type="text" name="name" placeholder="Tag name" required>
+    <button type="submit">Add Tag</button>
+</form>
+
+<h2>Existing Tags</h2>
+{% if tags %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tag in tags %}
+        <tr>
+            <td>{{ tag.name }}</td>
+            <td><code>{{ tag.slug }}</code></td>
+            <td>
+                <form method="POST" action="/admin/tags/{{ tag.id }}/delete" 
+                      onsubmit="return confirm('Delete tag {{ tag.name }}?');">
+                    <button type="submit" class="btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="muted">No tags yet.</p>
+{% endif %}
+{% endblock %}

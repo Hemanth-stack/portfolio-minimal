@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Message from {{ message.name }}{% endblock %}
+
+{% block content %}
+<h1>Message from {{ message.name }}</h1>
+
+<p><strong>From:</strong> {{ message.name }} (<a href="mailto:{{ message.email }}">{{ message.email }}</a>)</p>
+<p><strong>Subject:</strong> {{ message.subject }}</p>
+<p><strong>Date:</strong> {{ message.created_at.strftime('%B %d, %Y at %H:%M') }}</p>
+
+<hr>
+
+<div style="white-space: pre-wrap; background: var(--code-bg); padding: 1rem; border-radius: 5px;">{{ message.message }}</div>
+
+<hr>
+
+<p>
+    <a href="mailto:{{ message.email }}?subject=Re: {{ message.subject }}" class="btn">Reply via Email</a>
+    <a href="/admin/messages" class="btn btn-secondary">Back to Messages</a>
+</p>
+{% endblock %}

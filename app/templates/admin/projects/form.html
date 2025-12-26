@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ 'Edit' if project else 'New' }} Project{% endblock %}
+
+{% block content %}
+<h1>{{ 'Edit' if project else 'New' }} Project</h1>
+
+<form method="POST">
+    <label for="title">Title</label>
+    <input type="text" name="title" id="title" value="{{ project.title if project else '' }}" required>
+    
+    <label for="slug">Slug</label>
+    <input type="text" name="slug" id="slug" value="{{ project.slug if project else '' }}" placeholder="auto-generated if empty">
+    
+    <label for="short_description">Short Description</label>
+    <input type="text" name="short_description" id="short_description" value="{{ project.short_description if project else '' }}" maxlength="300" required>
+    
+    <label for="description">Full Description (Markdown)</label>
+    <textarea name="description" id="description" rows="15" required>{{ project.description if project else '' }}</textarea>
+    
+    <label for="tech_stack">Tech Stack (comma-separated)</label>
+    <input type="text" name="tech_stack" id="tech_stack" value="{{ project.tech_stack if project else '' }}" placeholder="Python, FastAPI, vLLM, Kubernetes">
+    
+    <label for="metrics">Key Metrics (optional)</label>
+    <input type="text" name="metrics" id="metrics" value="{{ project.metrics if project else '' }}" placeholder="e.g., 40% latency reduction, 4x throughput">
+    
+    <label for="github_url">GitHub URL (optional)</label>
+    <input type="url" name="github_url" id="github_url" value="{{ project.github_url if project else '' }}">
+    
+    <label for="live_url">Live Demo URL (optional)</label>
+    <input type="url" name="live_url" id="live_url" value="{{ project.live_url if project else '' }}">
+    
+    <label for="order">Display Order</label>
+    <input type="number" name="order" id="order" value="{{ project.order if project else 0 }}" min="0">
+    
+    <label>
+        <input type="checkbox" name="featured" {{ 'checked' if project and project.featured else '' }}>
+        Featured on homepage
+    </label>
+    <br><br>
+    
+    <button type="submit">{{ 'Update' if project else 'Create' }} Project</button>
+    <a href="/admin/projects" class="btn btn-secondary">Cancel</a>
+</form>
+
+<h3>Preview</h3>
+<div id="preview"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+const desc = document.getElementById('description');
+const preview = document.getElementById('preview');
+const title = document.getElementById('title');
+const slug = document.getElementById('slug');
+
+desc.addEventListener('input', () => {
+    preview.innerHTML = marked.parse(desc.value);
+});
+preview.innerHTML = marked.parse(desc.value);
+
+title.addEventListener('input', () => {
+    if (!slug.value) {
+        slug.value = title.value
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+});
+</script>
+{% endblock %}

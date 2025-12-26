@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Manage Categories{% endblock %}
+
+{% block content %}
+<h1>Categories</h1>
+
+<h2>Add New Category</h2>
+<form method="POST" action="/admin/categories/new" class="inline-form">
+    <input type="text" name="name" placeholder="Category name" required>
+    <input type="text" name="description" placeholder="Description (optional)">
+    <button type="submit">Add Category</button>
+</form>
+
+<h2>Existing Categories</h2>
+{% if categories %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cat in categories %}
+        <tr>
+            <td>{{ cat.name }}</td>
+            <td><code>{{ cat.slug }}</code></td>
+            <td>{{ cat.description or '-' }}</td>
+            <td>
+                <form method="POST" action="/admin/categories/{{ cat.id }}/delete" 
+                      onsubmit="return confirm('Delete category {{ cat.name }}?');">
+                    <button type="submit" class="btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="muted">No categories yet.</p>
+{% endif %}
+{% endblock %}

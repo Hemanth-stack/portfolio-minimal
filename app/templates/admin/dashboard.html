@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3>{{ stats.posts }}</h3>
+        <p>Posts</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ stats.projects }}</h3>
+        <p>Projects</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ stats.comments_pending }}</h3>
+        <p>Pending Comments</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ stats.messages_unread }}</h3>
+        <p>Unread Messages</p>
+    </div>
+</div>
+
+<hr>
+
+<h2>Quick Actions</h2>
+<p>
+    <a href="/admin/posts/new" class="btn">New Post</a>
+    <a href="/admin/projects/new" class="btn btn-secondary">New Project</a>
+</p>
+
+{% if recent_messages %}
+<h2>Recent Messages</h2>
+<table>
+    <thead>
+        <tr>
+            <th>From</th>
+            <th>Subject</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for msg in recent_messages %}
+        <tr>
+            <td>{{ msg.name }}</td>
+            <td><a href="/admin/messages/{{ msg.id }}">{{ msg.subject }}</a></td>
+            <td>{{ msg.created_at.strftime('%b %d') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

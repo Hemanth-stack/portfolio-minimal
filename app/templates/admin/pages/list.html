@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Pages{% endblock %}
+
+{% block content %}
+<h1>Pages</h1>
+<p class="muted">Edit static pages like About and Now.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Page</th>
+            <th>Last Updated</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for page in pages %}
+        <tr>
+            <td>{{ page.title }}</td>
+            <td>{{ page.updated_at.strftime('%b %d, %Y') if page.updated_at else 'Never' }}</td>
+            <td class="actions">
+                <a href="/{{ page.slug }}" target="_blank">View</a>
+                <a href="/admin/pages/{{ page.slug }}/edit">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% if not pages %}
+        <tr>
+            <td colspan="3" class="muted">No pages created yet. They'll appear after first site visit.</td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}

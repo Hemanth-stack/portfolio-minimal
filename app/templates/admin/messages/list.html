@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<h1>Contact Messages</h1>
+
+{% if messages %}
+<table>
+    <thead>
+        <tr>
+            <th>From</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for msg in messages %}
+        <tr>
+            <td>{{ msg.name }}<br><small class="muted">{{ msg.email }}</small></td>
+            <td><a href="/admin/messages/{{ msg.id }}">{{ msg.subject }}</a></td>
+            <td>
+                {% if msg.read %}
+                <span class="badge">Read</span>
+                {% else %}
+                <span class="badge badge-warning">Unread</span>
+                {% endif %}
+            </td>
+            <td>{{ msg.created_at.strftime('%b %d, %Y') }}</td>
+            <td class="actions">
+                <a href="mailto:{{ msg.email }}?subject=Re: {{ msg.subject }}">Reply</a>
+                <form method="POST" action="/admin/messages/{{ msg.id }}/delete" style="display:inline">
+                    <button type="submit" onclick="return confirm('Delete this message?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="muted">No messages yet.</p>
+{% endif %}
+{% endblock %}

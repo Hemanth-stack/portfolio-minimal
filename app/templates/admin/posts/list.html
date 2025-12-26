@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Posts{% endblock %}
+
+{% block content %}
+<h1>Posts</h1>
+<p><a href="/admin/posts/new" class="btn">New Post</a></p>
+
+{% if posts %}
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+        <tr>
+            <td>
+                <a href="/admin/posts/{{ post.id }}/edit">{{ post.title }}</a>
+            </td>
+            <td>
+                {% if post.published %}
+                <span class="badge badge-success">Published</span>
+                {% else %}
+                <span class="badge badge-warning">Draft</span>
+                {% endif %}
+            </td>
+            <td>{{ post.created_at.strftime('%b %d, %Y') }}</td>
+            <td class="actions">
+                <a href="/blog/{{ post.slug }}" target="_blank">View</a>
+                <a href="/admin/posts/{{ post.id }}/edit">Edit</a>
+                <form method="POST" action="/admin/posts/{{ post.id }}/delete" style="display:inline">
+                    <button type="submit" onclick="return confirm('Delete this post?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="muted">No posts yet. <a href="/admin/posts/new">Create your first post</a>.</p>
+{% endif %}
+{% endblock %}

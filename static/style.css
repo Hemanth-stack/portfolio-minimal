@@ -1,0 +1,746 @@
+/* 
+ * Minimal CSS for iamhemanth.in
+ * Inspired by bearblog and 100r.co
+ */
+
+:root {
+    --bg: #fff;
+    --fg: #111;
+    --fg-muted: #666;
+    --border: #ddd;
+    --link: #0066cc;
+    --link-visited: #551a8b;
+    --code-bg: #f5f5f5;
+    --max-width: 640px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #111;
+        --fg: #eee;
+        --fg-muted: #999;
+        --border: #333;
+        --link: #6db3f2;
+        --link-visited: #b399d4;
+        --code-bg: #1a1a1a;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    background: var(--bg);
+    color: var(--fg);
+}
+
+body {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Typography */
+h1, h2, h3 {
+    line-height: 1.3;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+h1 { font-size: 1.8rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.2rem; }
+
+p, ul, ol {
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--link);
+}
+
+a:visited {
+    color: var(--link-visited);
+}
+
+/* Navigation */
+header {
+    margin-bottom: 3rem;
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.site-title {
+    font-weight: bold;
+    text-decoration: none;
+    color: var(--fg);
+}
+
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--fg-muted);
+}
+
+.nav-links a:hover {
+    color: var(--fg);
+}
+
+/* Main content */
+main {
+    min-height: 60vh;
+}
+
+/* Footer */
+footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--fg-muted);
+}
+
+/* Blog post list */
+.post-list {
+    list-style: none;
+    padding: 0;
+}
+
+.post-list li {
+    margin-bottom: 1.5rem;
+}
+
+.post-meta {
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+}
+
+.post-title {
+    font-size: 1.1rem;
+    text-decoration: none;
+}
+
+.post-excerpt {
+    margin-top: 0.3rem;
+    color: var(--fg-muted);
+}
+
+/* Tags */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0;
+}
+
+.tag {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    background: var(--code-bg);
+    border-radius: 3px;
+    text-decoration: none;
+    color: var(--fg-muted);
+}
+
+.tag:hover {
+    color: var(--fg);
+}
+
+/* Code */
+pre, code {
+    font-family: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.9rem;
+}
+
+code {
+    background: var(--code-bg);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+}
+
+pre {
+    background: var(--code-bg);
+    padding: 1rem;
+    overflow-x: auto;
+    border-radius: 5px;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Projects */
+.project-card {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.project-card:last-child {
+    border-bottom: none;
+}
+
+.project-title {
+    margin-bottom: 0.3rem;
+}
+
+.project-links {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.project-links a {
+    margin-right: 1rem;
+}
+
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.5rem 0;
+}
+
+.tech-badge {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+    background: var(--code-bg);
+    border-radius: 3px;
+    color: var(--fg-muted);
+}
+
+.metric {
+    font-size: 0.85rem;
+    color: var(--link);
+    font-weight: 500;
+}
+
+/* Forms */
+form {
+    max-width: 100%;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 1rem;
+    background: var(--bg);
+    color: var(--fg);
+}
+
+textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+button, .btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--fg);
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 3px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button:hover, .btn:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background: var(--bg);
+    color: var(--fg);
+}
+
+/* Comments */
+.comments {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.comment {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.comment-meta {
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+    margin-bottom: 0.5rem;
+}
+
+/* Resume */
+.resume-section {
+    margin-bottom: 2rem;
+}
+
+.resume-header {
+    margin-bottom: 2rem;
+}
+
+.experience-item {
+    margin-bottom: 1.5rem;
+}
+
+.experience-title {
+    font-weight: bold;
+}
+
+.experience-company {
+    color: var(--fg-muted);
+}
+
+/* Flash messages */
+.flash {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 3px;
+}
+
+.flash-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.flash-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+@media (prefers-color-scheme: dark) {
+    .flash-success {
+        background: #1a3d1a;
+        color: #90ee90;
+    }
+    .flash-error {
+        background: #3d1a1a;
+        color: #ffaaaa;
+    }
+}
+
+/* Utilities */
+.muted {
+    color: var(--fg-muted);
+}
+
+.small {
+    font-size: 0.85rem;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+}
+
+/* Print styles */
+@media print {
+    body {
+        font-size: 12pt;
+        max-width: 100%;
+    }
+    header, footer, .no-print {
+        display: none;
+    }
+    a {
+        color: inherit;
+        text-decoration: underline;
+    }
+}
+
+/* ================================
+   Inline Editor Styles (Admin)
+   ================================ */
+
+/* Editable section wrapper */
+.editable-section {
+    position: relative;
+}
+
+/* Edit button (pencil icon) */
+.edit-section-btn {
+    position: absolute;
+    top: 0;
+    right: -2rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-section-btn:hover {
+    opacity: 1;
+}
+
+.edit-section-btn svg {
+    width: 1rem;
+    height: 1rem;
+    fill: var(--fg-muted);
+}
+
+.editable-section:hover .edit-section-btn {
+    opacity: 0.7;
+}
+
+/* Inline editor */
+.inline-editor {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1rem;
+    margin: -0.5rem;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.editor-title {
+    flex: 1;
+    min-width: 200px;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.editor-actions .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.editor-content {
+    width: 100%;
+    min-height: 150px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    resize: vertical;
+    background: var(--bg);
+    color: var(--fg);
+}
+
+.editor-preview {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.preview-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--fg-muted);
+    margin-bottom: 0.5rem;
+}
+
+.preview-content {
+    background: var(--bg);
+    padding: 0.75rem;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+}
+
+.preview-content h1:first-child,
+.preview-content h2:first-child,
+.preview-content h3:first-child {
+    margin-top: 0;
+}
+
+/* Add section button */
+.add-section-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 2px dashed var(--border);
+    background: transparent;
+    color: var(--fg-muted);
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.add-section-btn:hover {
+    border-color: var(--fg-muted);
+    color: var(--fg);
+}
+
+/* Section visibility toggle */
+.section-hidden {
+    opacity: 0.5;
+}
+
+.section-hidden .section-content {
+    position: relative;
+}
+
+.section-hidden .section-content::after {
+    content: "Hidden";
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.7rem;
+    background: var(--fg-muted);
+    color: var(--bg);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+}
+
+/* ================================
+   Blog Layout with Sidebar
+   ================================ */
+
+.blog-page {
+    max-width: 100%;
+}
+
+.blog-layout {
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 3rem;
+}
+
+@media (max-width: 768px) {
+    .blog-layout {
+        grid-template-columns: 1fr;
+    }
+    .blog-sidebar {
+        order: -1;
+        margin-bottom: 2rem;
+    }
+}
+
+.blog-main {
+    min-width: 0;
+}
+
+.blog-sidebar {
+    font-size: 0.9rem;
+}
+
+.sidebar-section {
+    margin-bottom: 2rem;
+}
+
+.sidebar-section h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.category-list, .archive-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-list li, .archive-list li {
+    padding: 0.3rem 0;
+}
+
+.archive-list .count {
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+}
+
+.category-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    background: var(--link);
+    color: var(--bg);
+    border-radius: 3px;
+    text-decoration: none;
+    margin-right: 0.3rem;
+}
+
+.category-badge:hover {
+    opacity: 0.9;
+}
+
+.filter-active {
+    padding: 0.5rem 1rem;
+    background: var(--code-bg);
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.post-item {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.post-item:last-child {
+    border-bottom: none;
+}
+
+.post-taxonomies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+/* ================================
+   Resume Page
+   ================================ */
+
+.resume-page {
+    position: relative;
+}
+
+.resume-actions {
+    margin-bottom: 2rem;
+}
+
+.resume-section {
+    margin-bottom: 1.5rem;
+}
+
+/* ================================
+   CAPTCHA Field
+   ================================ */
+
+.captcha-field {
+    background: var(--code-bg);
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.captcha-field label {
+    font-weight: 600;
+    color: var(--fg);
+}
+
+.captcha-field input {
+    max-width: 150px;
+}
+
+/* ================================
+   Modal
+   ================================ */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: var(--bg);
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.help-text {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+    display: block;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ================================
+   Admin Actions
+   ================================ */
+
+.admin-actions {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border);
+}
+
+/* ================================
+   Share Buttons
+   ================================ */
+
+.share-buttons {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+
+.share-buttons span {
+    color: var(--fg-muted);
+    margin-right: 0.5rem;
+}
+
+.share-buttons a {
+    margin-right: 1rem;
+}

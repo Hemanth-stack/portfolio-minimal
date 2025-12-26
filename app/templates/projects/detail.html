@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} – {{ settings.site_name }}{% endblock %}
+{% block description %}{{ project.short_description }}{% endblock %}
+
+{% block content %}
+<article>
+    <h1>{{ project.title }}</h1>
+    
+    {% if project.tech_stack %}
+    <div class="tech-stack">
+        {% for tech in project.tech_stack.split(',') %}
+        <span class="tech-badge">{{ tech.strip() }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if project.metrics %}
+    <p class="metric">📈 {{ project.metrics }}</p>
+    {% endif %}
+    
+    <div class="project-links" style="margin-bottom: 2rem;">
+        {% if project.github_url %}<a href="{{ project.github_url }}" rel="noopener">GitHub</a>{% endif %}
+        {% if project.live_url %}<a href="{{ project.live_url }}" rel="noopener">Live Demo</a>{% endif %}
+    </div>
+    
+    <div class="project-content">
+        {{ content | safe }}
+    </div>
+</article>
+
+<hr>
+<p><a href="/projects">← Back to all projects</a></p>
+{% endblock %}

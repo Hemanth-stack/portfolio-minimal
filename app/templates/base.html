@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ site.site_name }}{% endblock %}</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="{% block description %}{{ site.site_tagline }}{% endblock %}">
+    <meta name="author" content="{{ site.site_name }}">
+    <link rel="canonical" href="{{ settings.site_url }}{{ request.url.path }}">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ site.site_name }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ site.site_tagline }}{% endblock %}">
+    <meta property="og:url" content="{{ settings.site_url }}{{ request.url.path }}">
+    <meta property="og:site_name" content="{{ site.site_name }}">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ site.site_name }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ site.site_tagline }}{% endblock %}">
+    
+    <link rel="stylesheet" href="/static/style.css">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="site-title">{{ site.site_name }}</a>
+            <div class="nav-links">
+                <a href="/blog">blog</a>
+                <a href="/projects">projects</a>
+                <a href="/now">now</a>
+                <a href="/about">about</a>
+                <a href="/resume">resume</a>
+                <a href="/contact">contact</a>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <p>© {{ now.year }} {{ site.site_name }} · 
+            <a href="mailto:{{ site.site_email }}">email</a> · 
+            <a href="{{ site.linkedin_url }}" rel="noopener">linkedin</a> · 
+            <a href="{{ site.github_url }}" rel="noopener">github</a>
+        </p>
+    </footer>
+    
+    {% if is_admin %}
+    <script src="/static/editor.js"></script>
+    {% endif %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

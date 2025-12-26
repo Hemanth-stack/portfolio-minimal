@@ -1,0 +1,60 @@
+{% extends "base.html" %}{% block title %}Blog – {{ site.site_name }}{% endblock %}{% block description %}Articles on AI, MLOps, LLMs, and software engineering by {{ site.site_name }}.{% endblock %}{% block content %}<div class="blog-page">    <h1>Blog</h1>        {# Active filter display #}    {% if tag %}    <p class="filter-active">Posts tagged with <span class="tag">{{ tag.name }}</span></p>    <p><a href="/blog">← All posts</a></p>    {% elif category %}    <p class="filter-active">Posts in category <span class="category-badge">{{ category.name }}</span></p>    <p><a href="/blog">← All posts</a></p>    {% elif archive_year and archive_month %}    <p class="filter-active">Posts from {{ archive_month.name }} {{ archive_year }}</p>    <p><a href="/blog">← All posts</a></p>    {% elif archive_year %}    <p class="filter-active">Posts from {{ archive_year }}</p>    <p><a href="/blog">← All posts</a></p>    {% endif %}    <div class="blog-layout">        {# Main content #}        <div class="blog-main">            {% if posts %}            <ul class="post-list">                {% for post in posts %}                <li class="post-item">                    <div class="post-meta">                        {{ post.created_at.strftime('%b %d, %Y') }} · {{ post.read_time }} min read                    </div>                    <a href="/blog/{{ post.slug }}" class="post-title">{{ post.title }}</a>                    <p class="post-excerpt">{{ post.excerpt }}</p>                    <div class="post-taxonomies">                        {% if post.categories %}                        <span class="post-categories">                            {% for cat in post.categories %}                            <a href="/blog/category/{{ cat.slug }}" class="category-badge">{{ cat.name }}</a>                            {% endfor %}                        </span>                        {% endif %}                        {% if post.tags %}                        <span class="post-tags">                            {% for t in post.tags %}
+                            <a href="/blog/tag/{{ t.slug }}" class="tag">{{ t.name }}</a>
+                            {% endfor %}
+                        </span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="muted">No posts yet. Check back soon!</p>
+            {% endif %}
+        </div>
+        
+        {# Sidebar #}
+        <aside class="blog-sidebar">
+            {# Categories #}
+            {% if all_categories %}
+            <div class="sidebar-section">
+                <h3>Categories</h3>
+                <ul class="category-list">
+                    {% for cat in all_categories %}
+                    <li><a href="/blog/category/{{ cat.slug }}">{{ cat.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            {# Tags #}
+            {% if all_tags %}
+            <div class="sidebar-section">
+                <h3>Tags</h3>
+                <div class="tags">
+                    {% for t in all_tags %}
+                    <a href="/blog/tag/{{ t.slug }}" class="tag">{{ t.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {# Archives #}
+            {% if archives %}
+            <div class="sidebar-section">
+                <h3>Archives</h3>
+                <ul class="archive-list">
+                    {% for arch in archives %}
+                    <li>
+                        <a href="/blog/archive/{{ arch.year }}/{{ arch.month }}">
+                            {{ arch.month_name }} {{ arch.year }}
+                        </a>
+                        <span class="count">({{ arch.count }})</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </aside>
+    </div>
+</div>
+{% endblock %}

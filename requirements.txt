@@ -1,0 +1,33 @@
+# FastAPI & Server
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.18
+pydantic-settings==2.6.1
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+
+# Templates & Markdown
+jinja2==3.1.4
+markdown==3.7
+pygments==2.18.0  # Code syntax highlighting
+
+# Authentication & Security
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+itsdangerous==2.2.0
+
+# Email
+aiosmtplib==3.0.2
+email-validator==2.2.0
+
+# Utils
+python-dotenv==1.0.1
+python-slugify==8.0.4
+humanize==4.11.0
+
+# Development
+httpx==0.28.1
+reportlab==4.2.5

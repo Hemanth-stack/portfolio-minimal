@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "macros/editor.html" import pencil_icon, add_section_controls %}
+
+{% block title %}Contact – {{ site.site_name }}{% endblock %}
+{% block description %}Get in touch with {{ site.site_name }} for collaboration, job opportunities, or just to say hello.{% endblock %}
+
+{% block content %}
+<h1>Contact</h1>
+
+{# Intro section #}
+{% if sections.intro %}
+<div class="editable-section" 
+     data-section-id="{{ sections.intro.section.id }}"
+     data-page="contact"
+     data-section-key="intro">
+    {% if is_admin %}
+    <button type="button" class="edit-section-btn" title="Edit intro">
+        {{ pencil_icon() }}
+    </button>
+    {% endif %}
+    <div class="section-content">
+        {{ sections.intro.html | safe }}
+    </div>
+</div>
+{% endif %}
+
+{% if flash_message %}
+<div class="flash flash-{{ flash_type }}">
+    {{ flash_message }}
+</div>
+{% endif %}
+
+<form method="POST" action="/contact" class="contact-form">
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" required placeholder="Your name">
+    
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" required placeholder="your@email.com">
+    
+    <label for="message">Message</label>
+    <textarea name="message" id="message" rows="6" required placeholder="What's on your mind?"></textarea>
+    
+    {# CAPTCHA #}
+    <div class="captcha-field">
+        <label for="captcha_answer">{{ captcha.question }}</label>
+        <input type="text" name="captcha_answer" id="captcha_answer" required 
+               placeholder="Your answer" autocomplete="off">
+        <input type="hidden" name="captcha_token" value="{{ captcha.token }}">
+    </div>
+    
+    <button type="submit">Send Message</button>
+</form>
+
+<hr>
+
+{# Other ways section #}
+{% if sections.other_ways %}
+<div class="editable-section" 
+     data-section-id="{{ sections.other_ways.section.id }}"
+     data-page="contact"
+     data-section-key="other_ways">
+    {% if is_admin %}
+    <button type="button" class="edit-section-btn" title="Edit other ways">
+        {{ pencil_icon() }}
+    </button>
+    {% endif %}
+    <div class="section-content">
+        {{ sections.other_ways.html | safe }}
+    </div>
+</div>
+{% endif %}
+
+{# Admin: Add new section button #}
+{% if is_admin %}
+{{ add_section_controls('contact') }}
+{% endif %}
+{% endblock %}

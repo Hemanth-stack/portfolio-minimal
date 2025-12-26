@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Comments{% endblock %}
+
+{% block content %}
+<h1>Comments</h1>
+
+{% if comments %}
+<table>
+    <thead>
+        <tr>
+            <th>Author</th>
+            <th>Post</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for comment in comments %}
+        <tr>
+            <td>{{ comment.author_name }}<br><small class="muted">{{ comment.author_email }}</small></td>
+            <td><a href="/blog/{{ comment.post.slug }}" target="_blank">{{ comment.post.title[:30] }}...</a></td>
+            <td>
+                {% if comment.approved %}
+                <span class="badge badge-success">Approved</span>
+                {% else %}
+                <span class="badge badge-warning">Pending</span>
+                {% endif %}
+            </td>
+            <td>{{ comment.created_at.strftime('%b %d, %Y') }}</td>
+            <td class="actions">
+                {% if not comment.approved %}
+                <form method="POST" action="/admin/comments/{{ comment.id }}/approve" style="display:inline">
+                    <button type="submit">Approve</button>
+                </form>
+                {% endif %}
+                <form method="POST" action="/admin/comments/{{ comment.id }}/delete" style="display:inline">
+                    <button type="submit" onclick="return confirm('Delete this comment?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="5" style="padding-left: 2rem; color: var(--fg-muted);">
+                {{ comment.content[:200] }}{% if comment.content|length > 200 %}...{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="muted">No comments yet.</p>
+{% endif %}
+{% endblock %}

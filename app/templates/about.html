@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "macros/editor.html" import pencil_icon, add_section_controls %}
+
+{% block title %}About – {{ site.site_name }}{% endblock %}
+{% block description %}About {{ site.site_name }}, {{ site.site_tagline }}.{% endblock %}
+
+{% block content %}
+<h1>About Me</h1>
+
+{% for key, data in sections.items() %}
+<div class="editable-section" 
+     data-section-id="{{ data.section.id }}"
+     data-page="about"
+     data-section-key="{{ key }}">
+    {% if is_admin %}
+    <button type="button" class="edit-section-btn" title="Edit {{ data.section.title }}">
+        {{ pencil_icon() }}
+    </button>
+    {% endif %}
+    <div class="section-content">
+        {{ data.html | safe }}
+    </div>
+</div>
+{% endfor %}
+
+{% if is_admin %}
+{{ add_section_controls('about') }}
+{% endif %}
+{% endblock %}

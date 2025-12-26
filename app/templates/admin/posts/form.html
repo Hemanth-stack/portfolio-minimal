@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ 'Edit' if post else 'New' }} Post{% endblock %}
+
+{% block content %}
+<h1>{{ 'Edit' if post else 'New' }} Post</h1>
+
+<form method="POST">
+    <label for="title">Title</label>
+    <input type="text" name="title" id="title" value="{{ post.title if post else '' }}" required>
+    
+    <label for="slug">Slug</label>
+    <input type="text" name="slug" id="slug" value="{{ post.slug if post else '' }}" placeholder="auto-generated if empty">
+    
+    <label for="content">Content (Markdown)</label>
+    <textarea name="content" id="content" rows="20" required>{{ post.content if post else '' }}</textarea>
+    
+    <label for="excerpt">Excerpt (optional)</label>
+    <input type="text" name="excerpt" id="excerpt" value="{{ post.excerpt if post else '' }}" placeholder="auto-generated if empty">
+    
+    <label for="tags">Tags (comma-separated)</label>
+    <input type="text" name="tags" id="tags" value="{{ post.tags | map(attribute='name') | join(', ') if post and post.tags else '' }}" placeholder="python, llm, mlops">
+    
+    <label for="categories">Categories (comma-separated)</label>
+    <input type="text" name="categories" id="categories" value="{{ post.categories | map(attribute='name') | join(', ') if post and post.categories else '' }}" placeholder="AI, MLOps, Tutorials">
+    
+    <label>
+        <input type="checkbox" name="published" {{ 'checked' if post and post.published else '' }}>
+        Published
+    </label>
+    <br><br>
+    
+    <button type="submit">{{ 'Update' if post else 'Create' }} Post</button>
+    <a href="/admin/posts" class="btn btn-secondary">Cancel</a>
+</form>
+
+<h3>Preview</h3>
+<div id="preview"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+const content = document.getElementById('content');
+const preview = document.getElementById('preview');
+const title = document.getElementById('title');
+const slug = document.getElementById('slug');
+
+function updatePreview() {
+    preview.innerHTML = marked.parse(content.value);
+}
+
+content.addEventListener('input', updatePreview);
+updatePreview();
+
+// Auto-generate slug from title
+title.addEventListener('input', () => {
+    if (!slug.value) {
+        slug.value = title.value
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+    }
+});
+</script>
+{% endblock %}

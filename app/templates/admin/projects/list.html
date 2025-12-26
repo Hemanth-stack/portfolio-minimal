@@ -1,0 +1,43 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<h1>Projects</h1>
+<p><a href="/admin/projects/new" class="btn">New Project</a></p>
+
+{% if projects %}
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Featured</th>
+            <th>Order</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for project in projects %}
+        <tr>
+            <td><a href="/admin/projects/{{ project.id }}/edit">{{ project.title }}</a></td>
+            <td>
+                {% if project.featured %}
+                <span class="badge badge-success">Featured</span>
+                {% endif %}
+            </td>
+            <td>{{ project.order }}</td>
+            <td class="actions">
+                <a href="/projects/{{ project.slug }}" target="_blank">View</a>
+                <a href="/admin/projects/{{ project.id }}/edit">Edit</a>
+                <form method="POST" action="/admin/projects/{{ project.id }}/delete" style="display:inline">
+                    <button type="submit" onclick="return confirm('Delete this project?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="muted">No projects yet. <a href="/admin/projects/new">Add your first project</a>.</p>
+{% endif %}
+{% endblock %}
