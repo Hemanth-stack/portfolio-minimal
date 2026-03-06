@@ -362,15 +362,6 @@ async def download_resume():
     raise HTTPException(status_code=404, detail="Resume PDF not found")
 
 
-# ============ Services ============
-
-@router.get("/services", response_class=HTMLResponse)
-async def services(request: Request, db: AsyncSession = Depends(get_db)):
-    """Services/Hire Me page."""
-    ctx = await common_context(request, db)
-    return templates.TemplateResponse("services.html", ctx)
-
-
 @router.get("/contact", response_class=HTMLResponse)
 async def contact(request: Request, db: AsyncSession = Depends(get_db)):
     ctx = await common_context(request, db)
@@ -592,7 +583,7 @@ async def blog_by_category(request: Request, slug: str, db: AsyncSession = Depen
     category = result.scalar_one_or_none()
     
     if not category:
-        return RedirectResponse("/blog")
+        raise HTTPException(status_code=404, detail="Category not found")
     
     result = await db.execute(
         select(Post)
@@ -631,7 +622,7 @@ async def blog_by_tag(request: Request, slug: str, db: AsyncSession = Depends(ge
     tag = result.scalar_one_or_none()
     
     if not tag:
-        return RedirectResponse("/blog")
+        raise HTTPException(status_code=404, detail="Tag not found")
     
     result = await db.execute(
         select(Post)
@@ -674,12 +665,33 @@ async def blog_post(request: Request, slug: str, db: AsyncSession = Depends(get_
     post = result.scalar_one_or_none()
     
     if not post or not post.published:
-        return RedirectResponse("/blog")
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    # Increment view count
+    post.view_count = (post.view_count or 0) + 1
+    await db.commit()
     
     comments = [c for c in post.comments if c.approved]
 
     post_content = render_markdown(post.content)
     estimate_read_time_val = estimate_read_time(post.content)
+    
+    # Get previous and next posts
+    prev_result = await db.execute(
+        select(Post)
+        .where(Post.published == True, Post.created_at < post.created_at)
+        .order_by(Post.created_at.desc())
+        .limit(1)
+    )
+    prev_post = prev_result.scalar_one_or_none()
+    
+    next_result = await db.execute(
+        select(Post)
+        .where(Post.published == True, Post.created_at > post.created_at)
+        .order_by(Post.created_at.asc())
+        .limit(1)
+    )
+    next_post = next_result.scalar_one_or_none()
     
     render_template = templates.TemplateResponse("blog/post.html", {
         **ctx,
@@ -687,9 +699,47 @@ async def blog_post(request: Request, slug: str, db: AsyncSession = Depends(get_
         "content": post_content,
         "read_time": estimate_read_time_val,
         "comments": comments,
+        "prev_post": prev_post,
+        "next_post": next_post,
     })
 
     return render_template
+
+
+@router.post("/blog/{slug}/like", response_class=JSONResponse)
+async def like_post(request: Request, slug: str, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(Post).where(Post.slug == slug, Post.published == True)
+    )
+    post = result.scalar_one_or_none()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    # Check cookie for already-liked
+    liked_posts_cookie = request.cookies.get("liked_posts", "")
+    liked_slugs = [s.strip() for s in liked_posts_cookie.split(",") if s.strip()]
+    
+    already_liked = slug in liked_slugs
+    if not already_liked:
+        post.like_count = (post.like_count or 0) + 1
+        await db.commit()
+        liked_slugs.append(slug)
+    
+    response = JSONResponse({
+        "like_count": post.like_count,
+        "liked": True
+    })
+    
+    if not already_liked:
+        response.set_cookie(
+            "liked_posts",
+            ",".join(liked_slugs),
+            max_age=365 * 24 * 60 * 60,
+            httponly=False,
+            samesite="lax"
+        )
+    
+    return response
 
 
 @router.post("/blog/{slug}/comment")
@@ -745,7 +795,7 @@ async def project_detail(request: Request, slug: str, db: AsyncSession = Depends
     project = result.scalar_one_or_none()
     
     if not project:
-        return RedirectResponse("/projects")
+        raise HTTPException(status_code=404, detail="Project not found")
     
     return templates.TemplateResponse("projects/detail.html", {
         **ctx,
@@ -769,6 +819,27 @@ Sitemap: {settings.site_url}/sitemap.xml
 
 # Disallow admin pages
 Disallow: /admin/
+
+# Crawl delay (optional, be nice to small servers)
+# Crawl-delay: 1
+"""
+    return Response(content=content, media_type="text/plain")
+
+
+# Add humans.txt for transparency
+@router.get("/humans.txt")
+async def humans_txt():
+    """Serve humans.txt - give credit to the human behind the site."""
+    settings = get_settings()
+    content = f"""/* TEAM */
+Developer: {settings.site_name}
+Site: {settings.site_url}
+Location: India
+
+/* SITE */
+Standards: HTML5, CSS3, Python, FastAPI
+Components: PostgreSQL, SQLAlchemy, Jinja2
+Software: VS Code, Docker
 """
     return Response(content=content, media_type="text/plain")
 
@@ -779,14 +850,16 @@ async def sitemap_xml(db: AsyncSession = Depends(get_db)):
     settings = get_settings()
     base_url = settings.site_url
     
-    # Static pages
+    # Static pages with estimated last modification
+    from datetime import datetime
+    now = datetime.utcnow().strftime("%Y-%m-%d")
+    
     pages = [
-        {"loc": "/", "priority": "1.0", "changefreq": "weekly"},
-        {"loc": "/services", "priority": "0.95", "changefreq": "weekly"},
-        {"loc": "/blog", "priority": "0.9", "changefreq": "daily"},
-        {"loc": "/projects", "priority": "0.8", "changefreq": "weekly"},
-        {"loc": "/about", "priority": "0.7", "changefreq": "monthly"},
-        {"loc": "/contact", "priority": "0.6", "changefreq": "monthly"},
+        {"loc": "/", "priority": "1.0", "changefreq": "weekly", "lastmod": now},
+        {"loc": "/blog", "priority": "0.9", "changefreq": "daily", "lastmod": now},
+        {"loc": "/projects", "priority": "0.8", "changefreq": "weekly", "lastmod": now},
+        {"loc": "/about", "priority": "0.7", "changefreq": "monthly", "lastmod": now},
+        {"loc": "/contact", "priority": "0.6", "changefreq": "monthly", "lastmod": now},
     ]
     
     # Get all published blog posts
@@ -800,12 +873,14 @@ async def sitemap_xml(db: AsyncSession = Depends(get_db)):
     projects = result.scalars().all()
     
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
-    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+    xml += 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
     
     # Add static pages
     for page in pages:
         xml += f'  <url>\n'
         xml += f'    <loc>{base_url}{page["loc"]}</loc>\n'
+        xml += f'    <lastmod>{page["lastmod"]}</lastmod>\n'
         xml += f'    <changefreq>{page["changefreq"]}</changefreq>\n'
         xml += f'    <priority>{page["priority"]}</priority>\n'
         xml += f'  </url>\n'

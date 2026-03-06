@@ -6,12 +6,27 @@
 {% block og_title %}{{ post.title }}{% endblock %}
 {% block og_description %}{{ post.excerpt }}{% endblock %}
 
+{% block schema_type %}BlogPosting{% endblock %}
+{% block schema_extra %},
+        "headline": "{{ post.title }}",
+        "description": "{{ post.excerpt }}",
+        "datePublished": "{{ post.created_at.isoformat() }}",
+        "dateModified": "{{ post.updated_at.isoformat() }}",
+        "author": {
+            "@type": "Person",
+            "name": "{{ site.site_name }}"
+        },
+        "publisher": {
+            "@type": "Person",
+            "name": "{{ site.site_name }}"
+        }{% endblock %}
+
 {% block content %}
 <article class="blog-post">
     <header class="post-header">
         <h1>{{ post.title }}</h1>
         <p class="post-meta">
-            {{ post.created_at.strftime('%B %d, %Y') }} · {{ read_time }} min read
+            {{ post.created_at.strftime('%B %d, %Y') }} · {{ read_time }} min read · 👁 {{ post.view_count or 0 }} views
         </p>
         {% if post.categories %}
         <div class="post-categories">
@@ -33,6 +48,16 @@
         {{ content | safe }}
     </div>
     
+    {# Like button #}
+    <div class="post-like">
+        <button class="like-btn {% if post.slug in request.cookies.get('liked_posts', '').split(',') %}liked{% endif %}" 
+                data-slug="{{ post.slug }}" 
+                aria-label="Like this post">
+            <span class="like-icon">{% if post.slug in request.cookies.get('liked_posts', '').split(',') %}♥{% else %}♡{% endif %}</span>
+            <span class="like-count">{{ post.like_count or 0 }}</span>
+        </button>
+    </div>
+    
     {# Share buttons #}
     <div class="share-buttons">
         <span>Share:</span>
@@ -41,6 +66,23 @@
         <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.url }}&title={{ post.title }}" 
            target="_blank" rel="noopener">LinkedIn</a>
     </div>
+    {# Prev/Next Navigation #}
+    {% if prev_post or next_post %}
+    <nav class="post-nav">
+        <div class="post-nav-prev">
+            {% if prev_post %}
+            <span class="post-nav-label">← Previous</span>
+            <a href="/blog/{{ prev_post.slug }}">{{ prev_post.title }}</a>
+            {% endif %}
+        </div>
+        <div class="post-nav-next">
+            {% if next_post %}
+            <span class="post-nav-label">Next →</span>
+            <a href="/blog/{{ next_post.slug }}">{{ next_post.title }}</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
 </article>
 
 <section class="comments" id="comments">
@@ -76,4 +118,35 @@
 
 <hr>
 <p><a href="/blog">← Back to all posts</a></p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.querySelector('.like-btn');
+    if (!btn) return;
+    
+    // Set initial state from cookie
+    const liked = document.cookie.split(';')
+        .map(c => c.trim())
+        .find(c => c.startsWith('liked_posts='));
+    const likedSlugs = liked ? liked.split('=')[1].split(',') : [];
+    if (likedSlugs.includes(btn.dataset.slug)) {
+        btn.classList.add('liked');
+        btn.querySelector('.like-icon').textContent = '♥';
+    }
+    
+    btn.addEventListener('click', async () => {
+        if (btn.classList.contains('liked')) return;
+        
+        const res = await fetch(`/blog/${btn.dataset.slug}/like`, { method: 'POST' });
+        if (res.ok) {
+            const data = await res.json();
+            btn.classList.add('liked');
+            btn.querySelector('.like-icon').textContent = '♥';
+            btn.querySelector('.like-count').textContent = data.like_count;
+        }
+    });
+});
+</script>
 {% endblock %}
