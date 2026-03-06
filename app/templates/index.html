@@ -5,6 +5,90 @@
 
 {% block content %}
 {# Hero Section #}
+<section class="hero">
+    {# Neural Network SVG Background #}
+    <svg class="nn-bg" aria-hidden="true" role="presentation" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice">
+        {# Connection lines #}
+        <line class="nn-line nn-line-1" x1="80" y1="120" x2="280" y2="200"/>
+        <line class="nn-line nn-line-2" x1="280" y1="200" x2="460" y2="100"/>
+        <line class="nn-line nn-line-3" x1="460" y1="100" x2="680" y2="180"/>
+        <line class="nn-line nn-line-4" x1="680" y1="180" x2="900" y2="120"/>
+        <line class="nn-line nn-line-1" x1="900" y1="120" x2="1100" y2="200"/>
+        <line class="nn-line nn-line-3" x1="80" y1="120" x2="200" y2="350"/>
+        <line class="nn-line nn-line-2" x1="200" y1="350" x2="400" y2="420"/>
+        <line class="nn-line nn-line-1" x1="400" y1="420" x2="600" y2="350"/>
+        <line class="nn-line nn-line-3" x1="600" y1="350" x2="800" y2="450"/>
+        <line class="nn-line nn-line-2" x1="800" y1="450" x2="1000" y2="380"/>
+        <line class="nn-line nn-line-1" x1="1000" y1="380" x2="1100" y2="200"/>
+        <line class="nn-line nn-line-3" x1="150" y1="550" x2="350" y2="600"/>
+        <line class="nn-line nn-line-2" x1="350" y1="600" x2="550" y2="520"/>
+        <line class="nn-line nn-line-1" x1="550" y1="520" x2="750" y2="600"/>
+        <line class="nn-line nn-line-3" x1="750" y1="600" x2="950" y2="550"/>
+        <line class="nn-line nn-line-2" x1="280" y1="200" x2="200" y2="350"/>
+        <line class="nn-line nn-line-1" x1="460" y1="100" x2="400" y2="420"/>
+        <line class="nn-line nn-line-3" x1="680" y1="180" x2="600" y2="350"/>
+        <line class="nn-line nn-line-2" x1="900" y1="120" x2="1000" y2="380"/>
+        <line class="nn-line nn-line-1" x1="200" y1="350" x2="350" y2="600"/>
+        <line class="nn-line nn-line-3" x1="400" y1="420" x2="550" y2="520"/>
+        <line class="nn-line nn-line-2" x1="600" y1="350" x2="750" y2="600"/>
+        <line class="nn-line nn-line-1" x1="800" y1="450" x2="950" y2="550"/>
+        <line class="nn-line nn-line-3" x1="680" y1="180" x2="800" y2="450"/>
+        <line class="nn-line nn-line-2" x1="460" y1="100" x2="550" y2="520"/>
+        <line class="nn-line nn-line-1" x1="280" y1="200" x2="400" y2="420"/>
+        <line class="nn-line nn-line-3" x1="1100" y1="200" x2="950" y2="550"/>
+        <line class="nn-line nn-line-2" x1="80" y1="120" x2="150" y2="550"/>
+
+        {# Nodes — Layer 1 (top) #}
+        <circle class="nn-node nn-float-1" cx="80" cy="120" r="5"/>
+        <circle class="nn-node nn-float-2" cx="280" cy="200" r="6"/>
+        <circle class="nn-node nn-accent nn-float-3" cx="460" cy="100" r="7"/>
+        <circle class="nn-node nn-float-1" cx="680" cy="180" r="5"/>
+        <circle class="nn-node nn-float-2" cx="900" cy="120" r="6"/>
+        <circle class="nn-node nn-float-3" cx="1100" cy="200" r="5"/>
+
+        {# Nodes — Layer 2 (middle) #}
+        <circle class="nn-node nn-float-2 nn-hide-mobile" cx="200" cy="350" r="5"/>
+        <circle class="nn-node nn-float-3" cx="400" cy="420" r="6"/>
+        <circle class="nn-node nn-accent nn-float-1" cx="600" cy="350" r="8"/>
+        <circle class="nn-node nn-float-2" cx="800" cy="450" r="5"/>
+        <circle class="nn-node nn-float-3 nn-hide-mobile" cx="1000" cy="380" r="6"/>
+
+        {# Nodes — Layer 3 (bottom) #}
+        <circle class="nn-node nn-float-3 nn-hide-mobile" cx="150" cy="550" r="4"/>
+        <circle class="nn-node nn-float-1 nn-hide-mobile" cx="350" cy="600" r="5"/>
+        <circle class="nn-node nn-accent nn-float-2 nn-hide-mobile" cx="550" cy="520" r="6"/>
+        <circle class="nn-node nn-float-3 nn-hide-mobile" cx="750" cy="600" r="5"/>
+        <circle class="nn-node nn-float-1 nn-hide-mobile" cx="950" cy="550" r="4"/>
+
+        {# Extra scattered nodes #}
+        <circle class="nn-node nn-float-2 nn-hide-mobile" cx="50" cy="400" r="3"/>
+        <circle class="nn-node nn-float-1 nn-hide-mobile" cx="1150" cy="450" r="3"/>
+        <circle class="nn-node nn-float-3" cx="520" cy="250" r="4"/>
+        <circle class="nn-node nn-float-2" cx="840" cy="280" r="4"/>
+    </svg>
+
+    <div class="hero-text">
+        <p class="hero-greeting">Hello, I'm Hemanth,</p>
+        <h1 class="hero-title">AI &amp; MLOps<br>Engineer</h1>
+        <p class="hero-subtitle">based in India.</p>
+        <a href="/resume" class="btn-outline">Resume</a>
+    </div>
+    <div class="hero-image">
+        <div class="hero-photo-wrapper">
+            <div class="hero-decorations">
+                <span class="deco-plus">✦</span>
+                <span class="deco-plus deco-plus-2">✦</span>
+                <span class="deco-plus deco-plus-3">✦</span>
+            </div>
+            <img src="/static/profile.jpg?v=1" alt="Hemanth Irivichetty" class="hero-photo">
+            <div class="hero-lines">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Editable Hero Content (visible to all visitors) #}
 {% if sections.hero %}
 <div class="editable-section" 
      data-section-id="{{ sections.hero.section.id }}"
@@ -23,67 +107,77 @@
 
 {# What I Do Section #}
 {% if sections.what_i_do %}
-<div class="editable-section" 
-     data-section-id="{{ sections.what_i_do.section.id }}"
-     data-page="home"
-     data-section-key="what_i_do">
-    {% if is_admin %}
-    <button type="button" class="edit-section-btn" title="Edit section">
-        {{ pencil_icon() }}
-    </button>
-    {% endif %}
-    <div class="section-content">
-        {{ sections.what_i_do.html | safe }}
+<section class="section-what-i-do reveal-on-scroll">
+    <div class="editable-section" 
+         data-section-id="{{ sections.what_i_do.section.id }}"
+         data-page="home"
+         data-section-key="what_i_do">
+        {% if is_admin %}
+        <button type="button" class="edit-section-btn" title="Edit section">
+            {{ pencil_icon() }}
+        </button>
+        {% endif %}
+        <div class="section-content">
+            {{ sections.what_i_do.html | safe }}
+        </div>
     </div>
-</div>
+</section>
 {% endif %}
 
-{# Recent Writing - Auto-generated #}
-<h2>Recent writing</h2>
-{% if recent_posts %}
-<ul class="post-list">
-    {% for post in recent_posts[:3] %}
-    <li>
-        <span class="post-meta">{{ post.created_at.strftime('%b %d, %Y') }}</span>
-        <a href="/blog/{{ post.slug }}" class="post-title">{{ post.title }}</a>
-    </li>
-    {% endfor %}
-</ul>
-<p><a href="/blog">View all posts →</a></p>
-{% else %}
-<p class="muted">No posts yet. Check back soon!</p>
-{% endif %}
+{# Recent Writing #}
+<section class="section-recent reveal-on-scroll">
+    <h2>Recent Writing</h2>
+    {% if recent_posts %}
+    <ul class="post-list">
+        {% for post in recent_posts[:3] %}
+        <li>
+            <span class="post-meta">{{ post.created_at.strftime('%b %d, %Y') }}</span>
+            <a href="/blog/{{ post.slug }}" class="post-title">{{ post.title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <p><a href="/blog" class="link-arrow">View all posts →</a></p>
+    {% else %}
+    <p class="muted">No posts yet. Check back soon!</p>
+    {% endif %}
+</section>
 
-{# Featured Projects - Auto-generated #}
-<h2>Featured projects</h2>
-{% if featured_projects %}
-{% for project in featured_projects[:2] %}
-<div class="project-card">
-    <h3 class="project-title"><a href="/projects/{{ project.slug }}">{{ project.title }}</a></h3>
-    <p>{{ project.short_description }}</p>
-    {% if project.metrics %}<p class="metric">{{ project.metrics }}</p>{% endif %}
-</div>
-{% endfor %}
-<p><a href="/projects">View all projects →</a></p>
-{% else %}
-<p class="muted">Projects coming soon!</p>
-{% endif %}
+{# Featured Projects #}
+<section class="section-projects reveal-on-scroll">
+    <h2>Featured Projects</h2>
+    {% if featured_projects %}
+    <div class="projects-grid">
+        {% for project in featured_projects[:2] %}
+        <div class="project-card">
+            <h3 class="project-title"><a href="/projects/{{ project.slug }}">{{ project.title }}</a></h3>
+            <p>{{ project.short_description }}</p>
+            {% if project.metrics %}<p class="metric">{{ project.metrics }}</p>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <p><a href="/projects" class="link-arrow">View all projects →</a></p>
+    {% else %}
+    <p class="muted">Projects coming soon!</p>
+    {% endif %}
+</section>
 
 {# CTA Section #}
 {% if sections.cta %}
-<div class="editable-section" 
-     data-section-id="{{ sections.cta.section.id }}"
-     data-page="home"
-     data-section-key="cta">
-    {% if is_admin %}
-    <button type="button" class="edit-section-btn" title="Edit section">
-        {{ pencil_icon() }}
-    </button>
-    {% endif %}
-    <div class="section-content">
-        {{ sections.cta.html | safe }}
+<section class="section-cta reveal-on-scroll">
+    <div class="editable-section" 
+         data-section-id="{{ sections.cta.section.id }}"
+         data-page="home"
+         data-section-key="cta">
+        {% if is_admin %}
+        <button type="button" class="edit-section-btn" title="Edit section">
+            {{ pencil_icon() }}
+        </button>
+        {% endif %}
+        <div class="section-content">
+            {{ sections.cta.html | safe }}
+        </div>
     </div>
-</div>
+</section>
 {% endif %}
 
 {# Admin: Add new section button #}
