@@ -10,7 +10,7 @@ import time
 import os
 
 from app.database import get_db
-from app.models import Post, Project, Tag, Category, Comment, ContactMessage, Section
+from app.models import Post, PostView, Project, Tag, Category, Comment, ContactMessage, Section
 from app.config import get_settings
 from app.services.markdown import render_markdown, estimate_read_time, generate_excerpt
 from app.services.email import send_contact_notification, send_contact_confirmation
@@ -667,9 +667,18 @@ async def blog_post(request: Request, slug: str, db: AsyncSession = Depends(get_
     if not post or not post.published:
         raise HTTPException(status_code=404, detail="Post not found")
     
-    # Increment view count
-    post.view_count = (post.view_count or 0) + 1
-    await db.commit()
+    # Increment view count (unique per IP)
+    client_ip = request.client.host if request.client else "unknown"
+    existing_view = await db.execute(
+        select(PostView).where(
+            PostView.post_id == post.id,
+            PostView.ip_address == client_ip
+        )
+    )
+    if not existing_view.scalar_one_or_none():
+        db.add(PostView(post_id=post.id, ip_address=client_ip))
+        post.view_count = (post.view_count or 0) + 1
+        await db.commit()
     
     comments = [c for c in post.comments if c.approved]
 

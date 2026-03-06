@@ -50,6 +50,18 @@ class Post(Base):
     categories: Mapped[list["Category"]] = relationship(secondary=post_categories, back_populates="posts")
     comments: Mapped[list["Comment"]] = relationship(back_populates="post", cascade="all, delete-orphan")
 
+class PostView(Base):
+    """Track unique views per post by IP address."""
+    __tablename__ = "post_views"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), index=True)
+    ip_address: Mapped[str] = mapped_column(String(45))  # Supports IPv6
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (
+        UniqueConstraint('post_id', 'ip_address', name='uq_post_view_ip'),
+    )
 
 class Tag(Base):
     __tablename__ = "tags"

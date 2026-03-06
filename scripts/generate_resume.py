@@ -74,7 +74,7 @@ def generate_resume():
     # Professional Summary
     story.append(Paragraph("Professional Summary", heading_style))
     story.append(Paragraph(
-        "Product-focused AI Engineer with 2+ years of experience architecting high-performance LLM "
+        "Product-focused AI Engineer with 3+ years of experience architecting high-performance LLM "
         "inference engines and distributed RAG pipelines. Expert in reducing production latency by 40% "
         "and inference costs by 60% through advanced quantization and memory optimization. Proven track record "
         "of migrating legacy NLP systems to Transformer-based architectures and deploying scalable, secure AI "

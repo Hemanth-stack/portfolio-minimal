@@ -8,18 +8,9 @@ services:
     container_name: portfolio_web
     ports:
       - "8000:8000"
+    env_file: .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://hemanth:password@db:5432/portfolio
-      ADMIN_USERNAME: admin
-      ADMIN_PASSWORD: changeme
-      SECRET_KEY: your-secret-key-here
-      SMTP_HOST: smtp.gmail.com
-      SMTP_PORT: "587"
-      SMTP_USER: ihemanth.2001@gmail.com
-      SMTP_PASSWORD: your-app-password
-      SMTP_FROM: ihemanth.2001@gmail.com
-      SITE_URL: https://iamhemanth.in
-      SITE_NAME: Hemanth Irivichetty
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-hemanth}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-portfolio}
     depends_on:
       db:
         condition: service_healthy
@@ -34,14 +25,14 @@ services:
     image: postgres:15-alpine
     container_name: portfolio_db
     environment:
-      POSTGRES_DB: portfolio
-      POSTGRES_USER: hemanth
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB:-portfolio}
+      POSTGRES_USER: ${POSTGRES_USER:-hemanth}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hemanth"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hemanth}"]
       interval: 5s
       timeout: 5s
       retries: 5

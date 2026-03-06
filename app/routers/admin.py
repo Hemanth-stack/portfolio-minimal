@@ -1,6 +1,10 @@
+import os
+import uuid
 from datetime import datetime
-from fastapi import APIRouter, Request, Depends, Form, Response
-from fastapi.responses import HTMLResponse, RedirectResponse
+from pathlib import Path
+
+from fastapi import APIRouter, Request, Depends, Form, Response, UploadFile, File
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
@@ -895,3 +899,49 @@ async def delete_tag(request: Request, tag_id: int, db: AsyncSession = Depends(g
         await db.commit()
     
     return RedirectResponse("/admin/tags", status_code=303)
+
+
+# ============ Image Upload ============
+
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"}
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
+UPLOAD_DIR = Path("static/uploads")
+
+
+@router.post("/api/upload-image")
+async def upload_image(request: Request, file: UploadFile = File(...)):
+    """Upload an image for use in blog posts. Returns the markdown image URL."""
+    if not await require_auth(request):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+
+    # Validate content type
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        return JSONResponse(
+            {"error": f"File type '{file.content_type}' not allowed. Use JPEG, PNG, GIF, WebP, or SVG."},
+            status_code=400,
+        )
+
+    # Read file and check size
+    contents = await file.read()
+    if len(contents) > MAX_IMAGE_SIZE:
+        return JSONResponse(
+            {"error": f"File too large. Maximum size is {MAX_IMAGE_SIZE // (1024*1024)} MB."},
+            status_code=400,
+        )
+
+    # Generate unique filename
+    ext = Path(file.filename).suffix.lower() if file.filename else ".jpg"
+    if ext not in {".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"}:
+        ext = ".jpg"
+    unique_name = f"{uuid.uuid4().hex[:12]}{ext}"
+
+    # Ensure upload directory exists
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Save file
+    file_path = UPLOAD_DIR / unique_name
+    with open(file_path, "wb") as f:
+        f.write(contents)
+
+    url = f"/static/uploads/{unique_name}"
+    return JSONResponse({"url": url, "filename": unique_name})

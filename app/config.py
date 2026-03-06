@@ -1,8 +1,11 @@
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from functools import lru_cache
 
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(extra='ignore', env_file='.env')
+    
     # Database
     database_url: str = "postgresql+asyncpg://user:password@localhost:5432/portfolio"
     
@@ -24,9 +27,6 @@ class Settings(BaseSettings):
     site_url: str = "https://iamhemanth.in"
     site_name: str = "Hemanth Irivichetty"
     site_tagline: str = "AI & MLOps Engineer"
-    
-    class Config:
-        env_file = ".env"
 
 
 @lru_cache

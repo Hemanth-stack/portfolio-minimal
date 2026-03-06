@@ -15,7 +15,7 @@ DEFAULT_SECTIONS = {
             "title": "Hero Introduction",
             "content": """# Hi, I'm Hemanth 👋
 
-I'm an **AI & MLOps Engineer** with 2+ years of experience building high-performance LLM inference engines and distributed RAG pipelines.
+I'm an **AI & MLOps Engineer** with 3+ years of experience building high-performance LLM inference engines and distributed RAG pipelines.
 
 Currently working on LLM infrastructure at [EonForge](#), previously at [Zoho Corporation](#)."""
         },
@@ -38,7 +38,7 @@ Looking for an AI/ML engineer? [Send me a message](/contact) or email me at [ihe
     "about": {
         "intro": {
             "title": "Introduction",
-            "content": """I'm **Hemanth Irivichetty**, a product-focused AI Engineer with 2+ years of experience architecting high-performance LLM inference engines and distributed RAG pipelines."""
+            "content": """I'm **Hemanth Irivichetty**, a product-focused AI Engineer with 3+ years of experience architecting high-performance LLM inference engines and distributed RAG pipelines."""
         },
         "specialization": {
             "title": "What I Specialize In",
@@ -55,7 +55,7 @@ Looking for an AI/ML engineer? [Send me a message](/contact) or email me at [ihe
 
 Currently at **EonForge (Logos Technologies LLC)** as an LLM & Vision Infrastructure Engineer, where I design RAG pipelines and OCR systems for insurance automation.
 
-Previously at **Zoho Corporation** for 2+ years, where I:
+Previously at **Zoho Corporation** for 2.5 years, where I:
 - Increased LLM inference throughput from 20 to 80 tokens/sec (4x improvement)
 - Reduced P99 latency by 40% and inference costs by 60%
 - Led migration from RNN/LSTM to Transformer-based architectures"""
@@ -103,7 +103,7 @@ Looking for opportunities at MAANG companies and interesting freelance projects.
         },
         "goals": {
             "title": "Goals",
-            "content": """## Goals for 2025
+            "content": """## Goals for 2026
 
 - Land a role at a MAANG company
 - Write more technical blog posts
@@ -122,7 +122,7 @@ Looking for opportunities at MAANG companies and interesting freelance projects.
             "title": "Professional Summary",
             "content": """## Professional Summary
 
-Product-focused AI Engineer with 2+ years of experience architecting high-performance LLM inference engines and distributed RAG pipelines. Expert in reducing production latency by 40% and inference costs by 60% through advanced quantization and memory optimization. Proven track record of migrating legacy NLP systems to Transformer-based architectures and deploying scalable, secure AI microservices on Kubernetes (EKS)."""
+Product-focused AI Engineer with 3+ years of experience architecting high-performance LLM inference engines and distributed RAG pipelines. Expert in reducing production latency by 40% and inference costs by 60% through advanced quantization and memory optimization. Proven track record of migrating legacy NLP systems to Transformer-based architectures and deploying scalable, secure AI microservices on Kubernetes (EKS)."""
         },
         "skills": {
             "title": "Technical Skills",

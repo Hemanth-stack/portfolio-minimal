@@ -13,6 +13,29 @@
     <input type="text" name="slug" id="slug" value="{{ post.slug if post else '' }}" placeholder="auto-generated if empty">
     
     <label for="content">Content (Markdown)</label>
+    
+    {# Image upload toolbar #}
+    <div class="editor-toolbar">
+        <button type="button" id="upload-image-btn" class="toolbar-btn" title="Upload image">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span>Insert Image</span>
+        </button>
+        <span class="toolbar-hint">or drag &amp; drop / paste an image into the editor</span>
+    </div>
+
+    {# Hidden file input #}
+    <input type="file" id="image-file-input" accept="image/*" style="display: none;">
+
+    {# Upload progress indicator #}
+    <div id="upload-status" class="upload-status" style="display: none;">
+        <div class="upload-progress-bar"><div class="upload-progress-fill"></div></div>
+        <span class="upload-status-text">Uploading…</span>
+    </div>
+
     <textarea name="content" id="content" rows="20" required>{{ post.content if post else '' }}</textarea>
     
     <label for="excerpt">Excerpt (optional)</label>
@@ -46,6 +69,11 @@ const content = document.getElementById('content');
 const preview = document.getElementById('preview');
 const title = document.getElementById('title');
 const slug = document.getElementById('slug');
+const uploadBtn = document.getElementById('upload-image-btn');
+const fileInput = document.getElementById('image-file-input');
+const uploadStatus = document.getElementById('upload-status');
+const uploadStatusText = uploadStatus.querySelector('.upload-status-text');
+const uploadProgressFill = uploadStatus.querySelector('.upload-progress-fill');
 
 function updatePreview() {
     preview.innerHTML = marked.parse(content.value);
@@ -61,6 +89,128 @@ title.addEventListener('input', () => {
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-|-$/g, '');
+    }
+});
+
+// ============ Image Upload ============
+
+function showUploadStatus(text) {
+    uploadStatus.style.display = 'flex';
+    uploadStatusText.textContent = text;
+    uploadProgressFill.style.width = '0%';
+    // Animate progress indeterminate
+    uploadProgressFill.style.transition = 'width 2s ease';
+    requestAnimationFrame(() => { uploadProgressFill.style.width = '80%'; });
+}
+
+function hideUploadStatus() {
+    uploadProgressFill.style.transition = 'width 0.2s ease';
+    uploadProgressFill.style.width = '100%';
+    setTimeout(() => {
+        uploadStatus.style.display = 'none';
+        uploadProgressFill.style.width = '0%';
+    }, 400);
+}
+
+function insertTextAtCursor(textarea, text) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = textarea.value.substring(0, start);
+    const after = textarea.value.substring(end);
+    
+    // Add newlines if needed for clean markdown
+    const needNewlineBefore = before.length > 0 && !before.endsWith('\n') && !before.endsWith('\n\n');
+    const prefix = needNewlineBefore ? '\n\n' : '';
+    const needNewlineAfter = after.length > 0 && !after.startsWith('\n');
+    const suffix = needNewlineAfter ? '\n\n' : '';
+    
+    const insertion = prefix + text + suffix;
+    textarea.value = before + insertion + after;
+    textarea.selectionStart = textarea.selectionEnd = start + insertion.length;
+    textarea.focus();
+    textarea.dispatchEvent(new Event('input'));
+}
+
+async function uploadImage(file) {
+    // Validate client-side
+    const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    if (!allowed.includes(file.type)) {
+        alert('Only JPEG, PNG, GIF, WebP, and SVG images are allowed.');
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Image must be smaller than 5 MB.');
+        return;
+    }
+
+    showUploadStatus(`Uploading ${file.name}…`);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('/admin/api/upload-image', {
+            method: 'POST',
+            body: formData,
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Insert markdown image syntax at cursor position
+            const altText = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+            const markdown = `![${altText}](${data.url})`;
+            insertTextAtCursor(content, markdown);
+            hideUploadStatus();
+        } else {
+            hideUploadStatus();
+            alert('Upload failed: ' + (data.error || 'Unknown error'));
+        }
+    } catch (err) {
+        hideUploadStatus();
+        console.error('Upload error:', err);
+        alert('Upload failed. Please try again.');
+    }
+}
+
+// Click to upload
+uploadBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+        uploadImage(fileInput.files[0]);
+        fileInput.value = '';  // Reset so same file can be re-selected
+    }
+});
+
+// Drag & drop on textarea
+content.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    content.classList.add('drag-over');
+});
+content.addEventListener('dragleave', () => {
+    content.classList.remove('drag-over');
+});
+content.addEventListener('drop', (e) => {
+    e.preventDefault();
+    content.classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    for (const file of files) {
+        if (file.type.startsWith('image/')) {
+            uploadImage(file);
+        }
+    }
+});
+
+// Paste image from clipboard
+content.addEventListener('paste', (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+        if (item.type.startsWith('image/')) {
+            e.preventDefault();
+            const file = item.getAsFile();
+            if (file) uploadImage(file);
+            break;
+        }
     }
 });
 </script>
