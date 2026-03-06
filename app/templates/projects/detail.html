@@ -8,10 +8,10 @@
 {% block twitter_description %}{{ project.short_description }}{% endblock %}
 {% block schema_type %}SoftwareSourceCode{% endblock %}
 {% block schema_extra %},
-        "headline": "{{ project.title }}",
-        "description": "{{ project.short_description }}",
-        "programmingLanguage": "{{ project.tech_stack }}"{% if project.github_url %},
-        "codeRepository": "{{ project.github_url }}"{% endif %}{% endblock %}
+        "headline": {{ project.title|tojson }},
+        "description": {{ project.short_description|tojson }},
+        "programmingLanguage": {{ project.tech_stack|tojson }}{% if project.github_url %},
+        "codeRepository": {{ project.github_url|tojson }}{% endif %}{% endblock %}
 
 {% block content %}
 <article>

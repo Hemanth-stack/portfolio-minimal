@@ -47,12 +47,12 @@
     {
         "@context": "https://schema.org",
         "@type": "{% block schema_type %}Person{% endblock %}",
-        "name": "{{ site.site_name }}",
-        "url": "{{ settings.site_url }}",
-        "description": "{{ site.site_tagline }}",
+        "name": {{ site.site_name|tojson }},
+        "url": {{ settings.site_url|tojson }},
+        "description": {{ site.site_tagline|tojson }},
         "sameAs": [
-            "{{ site.linkedin_url }}",
-            "{{ site.github_url }}"
+            {{ site.linkedin_url|tojson }},
+            {{ site.github_url|tojson }}
         ]{% block schema_extra %}{% endblock %}
     }
     </script>

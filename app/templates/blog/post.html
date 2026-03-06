@@ -19,17 +19,17 @@
 
 {% block schema_type %}BlogPosting{% endblock %}
 {% block schema_extra %},
-        "headline": "{{ post.title }}",
-        "description": "{{ post.excerpt }}",
+        "headline": {{ post.title|tojson }},
+        "description": {{ post.excerpt|tojson }},
         "datePublished": "{{ post.created_at.isoformat() }}",
         "dateModified": "{{ post.updated_at.isoformat() }}",
         "author": {
             "@type": "Person",
-            "name": "{{ site.site_name }}"
+            "name": {{ site.site_name|tojson }}
         },
         "publisher": {
             "@type": "Person",
-            "name": "{{ site.site_name }}"
+            "name": {{ site.site_name|tojson }}
         }{% endblock %}
 
 {% block content %}
