@@ -43,6 +43,8 @@ class Post(Base):
     published: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    view_count: Mapped[int] = mapped_column(Integer, default=0)
+    like_count: Mapped[int] = mapped_column(Integer, default=0)
     
     tags: Mapped[list["Tag"]] = relationship(secondary=post_tags, back_populates="posts")
     categories: Mapped[list["Category"]] = relationship(secondary=post_categories, back_populates="posts")
