@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Projects – {{ settings.site_name }}{% endblock %}
-{% block description %}Projects and work by {{ settings.site_name }}, AI & MLOps Engineer.{% endblock %}
+{% block title %}Projects – {{ site.site_name }}{% endblock %}
+{% block description %}Projects and work by {{ site.site_name }}, AI & MLOps Engineer.{% endblock %}
+{% block og_title %}Projects – {{ site.site_name }}{% endblock %}
+{% block og_description %}Projects and work by {{ site.site_name }}, AI & MLOps Engineer.{% endblock %}
+{% block twitter_title %}Projects – {{ site.site_name }}{% endblock %}
+{% block twitter_description %}Projects and work by {{ site.site_name }}, AI & MLOps Engineer.{% endblock %}
 
 {% block content %}
 <h1>Projects</h1>

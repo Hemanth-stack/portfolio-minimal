@@ -442,6 +442,25 @@ async def contact_submit(
     })
 
 
+@router.get("/services", response_class=HTMLResponse)
+async def services(request: Request, db: AsyncSession = Depends(get_db)):
+    ctx = await common_context(request, db)
+    sections = await get_sections_for_page(db, "services")
+
+    rendered_sections = {
+        key: {
+            "section": section,
+            "html": render_section(section)
+        }
+        for key, section in sections.items()
+    }
+
+    return templates.TemplateResponse("services.html", {
+        **ctx,
+        "sections": rendered_sections,
+    })
+
+
 # ============ Blog Routes ============
 
 @router.get("/blog", response_class=HTMLResponse)
@@ -815,6 +834,51 @@ async def project_detail(request: Request, slug: str, db: AsyncSession = Depends
 
 # ============ SEO Routes ============
 
+@router.get("/feed.xml")
+@router.get("/rss.xml")
+async def rss_feed(db: AsyncSession = Depends(get_db)):
+    """Generate RSS 2.0 feed for blog posts."""
+    settings = get_settings()
+    base_url = settings.site_url
+
+    result = await db.execute(
+        select(Post)
+        .where(Post.published == True)
+        .options(selectinload(Post.tags))
+        .order_by(Post.created_at.desc())
+        .limit(20)
+    )
+    posts = result.scalars().all()
+
+    items = ""
+    for post in posts:
+        pub_date = post.created_at.strftime("%a, %d %b %Y %H:%M:%S +0000")
+        tag_cats = "".join(f"      <category>{t.name}</category>\n" for t in post.tags)
+        items += f"""    <item>
+      <title>{post.title}</title>
+      <link>{base_url}/blog/{post.slug}</link>
+      <guid isPermaLink="true">{base_url}/blog/{post.slug}</guid>
+      <pubDate>{pub_date}</pubDate>
+      <description><![CDATA[{post.excerpt or ''}]]></description>
+{tag_cats}    </item>
+"""
+
+    last_build = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S +0000")
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{settings.site_name}</title>
+    <link>{base_url}/blog</link>
+    <description>Latest blog posts from {settings.site_name}</description>
+    <language>en-us</language>
+    <lastBuildDate>{last_build}</lastBuildDate>
+    <atom:link href="{base_url}/feed.xml" rel="self" type="application/rss+xml"/>
+{items}  </channel>
+</rss>"""
+
+    return Response(content=xml, media_type="application/rss+xml")
+
+
 @router.get("/robots.txt")
 async def robots_txt():
     """Serve robots.txt for search engines."""
@@ -869,6 +933,9 @@ async def sitemap_xml(db: AsyncSession = Depends(get_db)):
         {"loc": "/projects", "priority": "0.8", "changefreq": "weekly", "lastmod": now},
         {"loc": "/about", "priority": "0.7", "changefreq": "monthly", "lastmod": now},
         {"loc": "/contact", "priority": "0.6", "changefreq": "monthly", "lastmod": now},
+        {"loc": "/services", "priority": "0.7", "changefreq": "monthly", "lastmod": now},
+        {"loc": "/now", "priority": "0.6", "changefreq": "weekly", "lastmod": now},
+        {"loc": "/resume", "priority": "0.6", "changefreq": "monthly", "lastmod": now},
     ]
     
     # Get all published blog posts
@@ -915,3 +982,12 @@ async def sitemap_xml(db: AsyncSession = Depends(get_db)):
     xml += '</urlset>'
     
     return Response(content=xml, media_type="application/xml")
+
+
+@router.get("/{key}.txt")
+async def indexnow_verification(key: str):
+    """Serve IndexNow API key verification file."""
+    settings = get_settings()
+    if settings.indexnow_api_key and key == settings.indexnow_api_key:
+        return Response(content=settings.indexnow_api_key, media_type="text/plain")
+    raise HTTPException(status_code=404, detail="Not found")

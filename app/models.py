@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import String, Text, Boolean, DateTime, ForeignKey, Table, Column, Integer, UniqueConstraint
+from sqlalchemy import String, Text, Boolean, DateTime, ForeignKey, Table, Column, Integer, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
@@ -169,3 +169,14 @@ class ContactMessage(Base):
     message: Mapped[str] = mapped_column(Text)
     read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class IndexingLog(Base):
+    __tablename__ = "indexing_logs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    url: Mapped[str] = mapped_column(String(500), nullable=False)
+    service: Mapped[str] = mapped_column(String(20), nullable=False)  # 'indexnow' or 'google'
+    status_code: Mapped[int] = mapped_column(Integer, nullable=True)
+    response: Mapped[str] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

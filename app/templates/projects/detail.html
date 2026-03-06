@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}{{ project.title }} – {{ settings.site_name }}{% endblock %}
+{% block title %}{{ project.title }} – {{ site.site_name }}{% endblock %}
 {% block description %}{{ project.short_description }}{% endblock %}
+{% block og_title %}{{ project.title }} – {{ site.site_name }}{% endblock %}
+{% block og_description %}{{ project.short_description }}{% endblock %}
+{% block twitter_title %}{{ project.title }} – {{ site.site_name }}{% endblock %}
+{% block twitter_description %}{{ project.short_description }}{% endblock %}
+{% block schema_type %}SoftwareSourceCode{% endblock %}
+{% block schema_extra %},
+        "headline": "{{ project.title }}",
+        "description": "{{ project.short_description }}",
+        "programmingLanguage": "{{ project.tech_stack }}"{% if project.github_url %},
+        "codeRepository": "{{ project.github_url }}"{% endif %}{% endblock %}
 
 {% block content %}
 <article>

@@ -2,6 +2,23 @@
 
 {% block title %}Services – {{ site.site_name }}{% endblock %}
 {% block description %}AI/ML consulting, MLOps implementation, and custom AI solutions. Hire Hemanth for your next project.{% endblock %}
+{% block og_title %}Services – {{ site.site_name }}{% endblock %}
+{% block og_description %}AI/ML consulting, MLOps implementation, and custom AI solutions. Hire Hemanth for your next project.{% endblock %}
+{% block twitter_title %}Services – {{ site.site_name }}{% endblock %}
+{% block twitter_description %}AI/ML consulting, MLOps implementation, and custom AI solutions. Hire Hemanth for your next project.{% endblock %}
+{% block schema_type %}ProfessionalService{% endblock %}
+{% block schema_extra %},
+        "serviceType": "AI/ML Consulting",
+        "areaServed": "Global",
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "AI/ML Services",
+            "itemListElement": [
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "AI/ML Consulting"}},
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "MLOps Implementation"}},
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Custom AI Solutions"}}
+            ]
+        }{% endblock %}
 
 {% block content %}
 <div class="services-page">

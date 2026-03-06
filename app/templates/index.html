@@ -2,6 +2,11 @@
 {% from "macros/editor.html" import editable_section, pencil_icon, add_section_controls %}
 
 {% block title %}{{ site.site_name }} – {{ site.site_tagline }}{% endblock %}
+{% block description %}{{ site.site_tagline }}{% endblock %}
+{% block og_title %}{{ site.site_name }} – {{ site.site_tagline }}{% endblock %}
+{% block og_description %}{{ site.site_tagline }}{% endblock %}
+{% block twitter_title %}{{ site.site_name }} – {{ site.site_tagline }}{% endblock %}
+{% block twitter_description %}{{ site.site_tagline }}{% endblock %}
 
 {% block content %}
 {# Hero Section #}

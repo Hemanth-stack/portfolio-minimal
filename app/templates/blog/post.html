@@ -5,6 +5,17 @@
 {% block og_type %}article{% endblock %}
 {% block og_title %}{{ post.title }}{% endblock %}
 {% block og_description %}{{ post.excerpt }}{% endblock %}
+{% block twitter_title %}{{ post.title }}{% endblock %}
+{% block twitter_description %}{{ post.excerpt }}{% endblock %}
+
+{% block head %}
+<meta property="article:published_time" content="{{ post.created_at.isoformat() }}">
+<meta property="article:modified_time" content="{{ post.updated_at.isoformat() }}">
+<meta property="article:author" content="{{ site.site_name }}">
+{% for tag in post.tags %}
+<meta property="article:tag" content="{{ tag.name }}">
+{% endfor %}
+{% endblock %}
 
 {% block schema_type %}BlogPosting{% endblock %}
 {% block schema_extra %},
@@ -123,28 +134,77 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    /* ── Like button ── */
     const btn = document.querySelector('.like-btn');
-    if (!btn) return;
-    
-    // Set initial state from cookie
-    const liked = document.cookie.split(';')
-        .map(c => c.trim())
-        .find(c => c.startsWith('liked_posts='));
-    const likedSlugs = liked ? liked.split('=')[1].split(',') : [];
-    if (likedSlugs.includes(btn.dataset.slug)) {
-        btn.classList.add('liked');
-        btn.querySelector('.like-icon').textContent = '♥';
-    }
-    
-    btn.addEventListener('click', async () => {
-        if (btn.classList.contains('liked')) return;
-        
-        const res = await fetch(`/blog/${btn.dataset.slug}/like`, { method: 'POST' });
-        if (res.ok) {
-            const data = await res.json();
+    if (btn) {
+        const liked = document.cookie.split(';')
+            .map(c => c.trim())
+            .find(c => c.startsWith('liked_posts='));
+        const likedSlugs = liked ? liked.split('=')[1].split(',') : [];
+        if (likedSlugs.includes(btn.dataset.slug)) {
             btn.classList.add('liked');
             btn.querySelector('.like-icon').textContent = '♥';
-            btn.querySelector('.like-count').textContent = data.like_count;
+        }
+        
+        btn.addEventListener('click', async () => {
+            if (btn.classList.contains('liked')) return;
+            
+            const res = await fetch(`/blog/${btn.dataset.slug}/like`, { method: 'POST' });
+            if (res.ok) {
+                const data = await res.json();
+                btn.classList.add('liked');
+                btn.querySelector('.like-icon').textContent = '♥';
+                btn.querySelector('.like-count').textContent = data.like_count;
+            }
+        });
+    }
+
+    /* ── Code block copy buttons ── */
+    const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+    const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    document.querySelectorAll('.post-content div.highlight').forEach(block => {
+        const lang = block.dataset.lang || '';
+        const pre = block.querySelector('pre');
+        if (!pre) return;
+
+        // Wrap in container
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        block.parentNode.insertBefore(wrapper, block);
+        wrapper.appendChild(block);
+
+        // Build header with language label + copy button
+        if (lang || true) { // always show header for copy button
+            const header = document.createElement('div');
+            header.className = 'code-block-header';
+
+            const langSpan = document.createElement('span');
+            langSpan.className = 'code-lang';
+            langSpan.textContent = lang || 'code';
+            header.appendChild(langSpan);
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'code-copy-btn';
+            copyBtn.type = 'button';
+            copyBtn.setAttribute('aria-label', 'Copy code');
+            copyBtn.innerHTML = copyIcon + ' Copy';
+            header.appendChild(copyBtn);
+
+            wrapper.insertBefore(header, block);
+
+            copyBtn.addEventListener('click', () => {
+                const code = pre.querySelector('code');
+                const text = (code || pre).textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    copyBtn.innerHTML = checkIcon + ' Copied!';
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyBtn.innerHTML = copyIcon + ' Copy';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
         }
     });
 });

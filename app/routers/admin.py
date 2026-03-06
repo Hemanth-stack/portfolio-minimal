@@ -12,11 +12,12 @@ from sqlalchemy.orm import selectinload
 from slugify import slugify
 
 from app.database import get_db
-from app.models import Post, Project, Page, Tag, Category, Comment, ContactMessage, SiteSettings, ResumeSection
+from app.models import Post, Project, Page, Tag, Category, Comment, ContactMessage, SiteSettings, ResumeSection, IndexingLog
 from app.config import get_settings
 from app.services.auth import verify_session_token, create_session_token
 from app.services.markdown import generate_excerpt
 from app.services.content import get_all_settings, DEFAULT_SETTINGS
+from app.services.seo import notify_search_engines
 
 router = APIRouter(prefix="/admin")
 templates = Jinja2Templates(directory="app/templates")
@@ -248,6 +249,13 @@ async def create_post(
     db.add(post)
     await db.commit()
     
+    # Notify search engines when a published post is created
+    if published:
+        settings = get_settings()
+        url = f"{settings.site_url}/blog/{slug}"
+        import asyncio
+        asyncio.create_task(notify_search_engines(url, db))
+    
     return RedirectResponse("/admin/posts", status_code=303)
 
 
@@ -327,6 +335,14 @@ async def update_post(
             post.categories.append(category)
     
     await db.commit()
+    
+    # Notify search engines when a published post is updated
+    if published:
+        settings = get_settings()
+        url = f"{settings.site_url}/blog/{post.slug}"
+        import asyncio
+        asyncio.create_task(notify_search_engines(url, db))
+    
     return RedirectResponse("/admin/posts", status_code=303)
 
 
@@ -945,3 +961,50 @@ async def upload_image(request: Request, file: UploadFile = File(...)):
 
     url = f"/static/uploads/{unique_name}"
     return JSONResponse({"url": url, "filename": unique_name})
+
+
+# ============ SEO Dashboard ============
+
+@router.get("/seo", response_class=HTMLResponse)
+async def seo_dashboard(request: Request, db: AsyncSession = Depends(get_db)):
+    if not await require_auth(request):
+        return RedirectResponse("/admin/login", status_code=303)
+
+    ctx = await admin_context(request, db)
+    settings = get_settings()
+
+    # Get recent indexing logs
+    result = await db.execute(
+        select(IndexingLog).order_by(IndexingLog.created_at.desc()).limit(50)
+    )
+    logs = result.scalars().all()
+
+    # Get stats
+    total_logs = await db.execute(select(func.count(IndexingLog.id)))
+    total_count = total_logs.scalar() or 0
+
+    success_logs = await db.execute(
+        select(func.count(IndexingLog.id)).where(IndexingLog.status_code.between(200, 299))
+    )
+    success_count = success_logs.scalar() or 0
+
+    # Published post count
+    published_result = await db.execute(
+        select(func.count(Post.id)).where(Post.published == True)
+    )
+    published_count = published_result.scalar() or 0
+
+    seo_config = {
+        "indexnow_configured": bool(settings.indexnow_api_key),
+        "google_configured": bool(settings.google_service_account_json),
+        "site_url": settings.site_url,
+    }
+
+    return templates.TemplateResponse("admin/seo.html", {
+        **ctx,
+        "logs": logs,
+        "total_count": total_count,
+        "success_count": success_count,
+        "published_count": published_count,
+        "seo_config": seo_config,
+    })

@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     # Security
     secret_key: str = "change-this-secret-key"
     
+    # SEO / Indexing
+    indexnow_api_key: str = ""
+    google_service_account_json: str = ""  # Path to JSON file inside container
+
     # SMTP
     smtp_host: str = "smtp.gmail.com"
     smtp_port: int = 587

@@ -62,8 +62,47 @@
 
 {% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/vs2015.min.css">
+<style>
+.code-block-wrapper { position: relative; margin: 1rem 0; }
+.code-block-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #2d2d2d; padding: 0.3rem 0.8rem;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border: 1px solid #333; border-bottom: none;
+}
+.code-block-header .code-lang {
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.04em; color: #858585;
+    font-family: "SF Mono", Consolas, monospace;
+}
+.code-copy-btn {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    background: transparent; border: none; color: #858585;
+    cursor: pointer; font-size: 0.75rem; padding: 0.15rem 0.4rem;
+    border-radius: 4px; transition: color 0.2s, background 0.2s;
+}
+.code-copy-btn:hover { color: #d4d4d4; background: rgba(255,255,255,0.1); }
+.code-copy-btn.copied { color: #89d185; }
+.code-copy-btn svg { width: 14px; height: 14px; }
+.code-block-wrapper pre {
+    border-radius: 0 0 var(--radius) var(--radius);
+    border-top: none; margin: 0;
+}
+#preview pre {
+    background: #1e1e1e; color: #d4d4d4; padding: 1rem; overflow-x: auto;
+    border-radius: var(--radius); border: 1px solid #333;
+}
+#preview code { font-family: "SF Mono", Consolas, monospace; font-size: 0.88rem; }
+#preview pre code { background: none; padding: 0; color: inherit; }
+#preview :not(pre) > code { background: var(--code-bg); padding: 0.15rem 0.4rem; border-radius: 4px; }
+</style>
+{% endblock %}
+
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 <script>
 const content = document.getElementById('content');
 const preview = document.getElementById('preview');
@@ -75,8 +114,64 @@ const uploadStatus = document.getElementById('upload-status');
 const uploadStatusText = uploadStatus.querySelector('.upload-status-text');
 const uploadProgressFill = uploadStatus.querySelector('.upload-progress-fill');
 
+const copyIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const checkIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+marked.setOptions({
+    highlight: function(code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+            return hljs.highlight(code, { language: lang }).value;
+        }
+        return hljs.highlightAuto(code).value;
+    }
+});
+
+function wrapCodeBlocks() {
+    preview.querySelectorAll('pre > code').forEach(codeEl => {
+        const pre = codeEl.parentElement;
+        if (pre.parentElement.classList.contains('code-block-wrapper')) return;
+
+        const lang = (codeEl.className.match(/language-(\w+)/) || [])[1] || '';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const header = document.createElement('div');
+        header.className = 'code-block-header';
+        const langSpan = document.createElement('span');
+        langSpan.className = 'code-lang';
+        langSpan.textContent = lang || 'code';
+        header.appendChild(langSpan);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'code-copy-btn';
+        copyBtn.type = 'button';
+        copyBtn.innerHTML = copyIcon + ' Copy';
+        header.appendChild(copyBtn);
+        wrapper.insertBefore(header, pre);
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(codeEl.textContent).then(() => {
+                copyBtn.innerHTML = checkIcon + ' Copied!';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.innerHTML = copyIcon + ' Copy';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+    });
+}
+
+let previewTimeout;
 function updatePreview() {
-    preview.innerHTML = marked.parse(content.value);
+    clearTimeout(previewTimeout);
+    previewTimeout = setTimeout(() => {
+        preview.innerHTML = marked.parse(content.value);
+        wrapCodeBlocks();
+    }, 150);
 }
 
 content.addEventListener('input', updatePreview);

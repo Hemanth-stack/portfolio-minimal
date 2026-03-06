@@ -1,0 +1,117 @@
+{% extends "admin/base.html" %}
+
+{% block title %}SEO Dashboard{% endblock %}
+
+{% block content %}
+<h1>SEO Dashboard</h1>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3>{{ published_count }}</h3>
+        <p>Published Posts</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_count }}</h3>
+        <p>Indexing Requests</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ success_count }}</h3>
+        <p>Successful</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_count - success_count }}</h3>
+        <p>Failed</p>
+    </div>
+</div>
+
+<hr>
+
+<h2>Configuration</h2>
+<table>
+    <tbody>
+        <tr>
+            <td><strong>Site URL</strong></td>
+            <td>{{ seo_config.site_url }}</td>
+        </tr>
+        <tr>
+            <td><strong>IndexNow API</strong></td>
+            <td>
+                {% if seo_config.indexnow_configured %}
+                <span style="color: #4caf50;">✓ Configured</span>
+                {% else %}
+                <span style="color: #f44336;">✗ Not configured</span>
+                <br><small>Set <code>INDEXNOW_API_KEY</code> env variable</small>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Google Indexing API</strong></td>
+            <td>
+                {% if seo_config.google_configured %}
+                <span style="color: #4caf50;">✓ Configured</span>
+                {% else %}
+                <span style="color: #f44336;">✗ Not configured</span>
+                <br><small>Set <code>GOOGLE_SERVICE_ACCOUNT_JSON</code> env variable</small>
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h2>Quick Links</h2>
+<p>
+    <a href="/sitemap.xml" target="_blank" class="btn btn-secondary">Sitemap</a>
+    <a href="/feed.xml" target="_blank" class="btn btn-secondary">RSS Feed</a>
+    <a href="/robots.txt" target="_blank" class="btn btn-secondary">robots.txt</a>
+    <a href="https://search.google.com/search-console" target="_blank" class="btn btn-secondary">Google Search Console ↗</a>
+    <a href="https://www.bing.com/webmasters" target="_blank" class="btn btn-secondary">Bing Webmaster Tools ↗</a>
+</p>
+
+<hr>
+
+<h2>Recent Indexing Logs</h2>
+{% if logs %}
+<table>
+    <thead>
+        <tr>
+            <th>URL</th>
+            <th>Service</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for log in logs %}
+        <tr>
+            <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <a href="{{ log.url }}" target="_blank" title="{{ log.url }}">{{ log.url }}</a>
+            </td>
+            <td>
+                {% if log.service == 'indexnow' %}
+                <span style="background: #1a73e8; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.8em;">IndexNow</span>
+                {% elif log.service == 'google' %}
+                <span style="background: #ea4335; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.8em;">Google</span>
+                {% else %}
+                {{ log.service }}
+                {% endif %}
+            </td>
+            <td>
+                {% if log.status_code and log.status_code >= 200 and log.status_code < 300 %}
+                <span style="color: #4caf50;">{{ log.status_code }} ✓</span>
+                {% elif log.status_code %}
+                <span style="color: #f44336;">{{ log.status_code }} ✗</span>
+                {% else %}
+                <span style="color: #999;">—</span>
+                {% endif %}
+            </td>
+            <td>{{ log.created_at.strftime('%b %d, %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p style="color: #888;">No indexing requests yet. Publish or update a blog post to trigger automatic indexing.</p>
+{% endif %}
+{% endblock %}

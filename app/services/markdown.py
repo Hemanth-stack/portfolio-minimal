@@ -14,6 +14,9 @@ def estimate_read_time(text: str) -> int:
 
 def render_markdown(text: str) -> str:
     """Convert markdown to HTML with syntax highlighting."""
+    # Extract language names from fenced code block openers
+    langs = re.findall(r'^```(\w+)\s*$', text, re.MULTILINE)
+
     md = markdown.Markdown(
         extensions=[
             'fenced_code',
@@ -23,7 +26,19 @@ def render_markdown(text: str) -> str:
             TocExtension(permalink=False),
         ]
     )
-    return md.convert(text)
+    html = md.convert(text)
+
+    # Inject data-lang attribute into each <div class="highlight">
+    lang_iter = iter(langs)
+
+    def _add_lang(match: re.Match) -> str:
+        lang = next(lang_iter, None)
+        if lang:
+            return f'<div class="highlight" data-lang="{lang}">'
+        return match.group(0)
+
+    html = re.sub(r'<div class="highlight">', _add_lang, html)
+    return html
 
 
 def strip_markdown(text: str) -> str:
