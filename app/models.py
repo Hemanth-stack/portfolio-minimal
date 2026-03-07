@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import String, Text, Boolean, DateTime, ForeignKey, Table, Column, Integer, UniqueConstraint, func
+from sqlalchemy import String, Text, Boolean, DateTime, ForeignKey, Table, Column, Integer, Index, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
@@ -51,16 +51,16 @@ class Post(Base):
     comments: Mapped[list["Comment"]] = relationship(back_populates="post", cascade="all, delete-orphan")
 
 class PostView(Base):
-    """Track unique views per post by IP address."""
+    """Track views per post by visitor cookie ID with time-window dedup."""
     __tablename__ = "post_views"
     
     id: Mapped[int] = mapped_column(primary_key=True)
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.id", ondelete="CASCADE"), index=True)
-    ip_address: Mapped[str] = mapped_column(String(45))  # Supports IPv6
+    visitor_id: Mapped[str] = mapped_column(String(36))  # UUID cookie
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     
     __table_args__ = (
-        UniqueConstraint('post_id', 'ip_address', name='uq_post_view_ip'),
+        Index('ix_post_views_dedup', 'post_id', 'visitor_id', 'created_at'),
     )
 
 class Tag(Base):

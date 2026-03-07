@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Request, Depends, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, FileResponse, Response
 from fastapi.templating import Jinja2Templates
@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 import hashlib
 import time
 import os
+import uuid
 
 from app.database import get_db
 from app.models import Post, PostView, Project, Tag, Category, Comment, ContactMessage, Section
@@ -686,19 +687,6 @@ async def blog_post(request: Request, slug: str, db: AsyncSession = Depends(get_
     if not post or not post.published:
         raise HTTPException(status_code=404, detail="Post not found")
     
-    # Increment view count (unique per IP)
-    client_ip = request.client.host if request.client else "unknown"
-    existing_view = await db.execute(
-        select(PostView).where(
-            PostView.post_id == post.id,
-            PostView.ip_address == client_ip
-        )
-    )
-    if not existing_view.scalar_one_or_none():
-        db.add(PostView(post_id=post.id, ip_address=client_ip))
-        post.view_count = (post.view_count or 0) + 1
-        await db.commit()
-    
     comments = [c for c in post.comments if c.approved]
 
     post_content = render_markdown(post.content)
@@ -731,7 +719,49 @@ async def blog_post(request: Request, slug: str, db: AsyncSession = Depends(get_
         "next_post": next_post,
     })
 
+    # Set visitor_id cookie if not present
+    if not request.cookies.get("visitor_id"):
+        visitor_id = str(uuid.uuid4())
+        render_template.set_cookie(
+            "visitor_id", visitor_id,
+            max_age=365 * 24 * 60 * 60,
+            httponly=True,
+            samesite="lax",
+        )
+
     return render_template
+
+
+@router.post("/blog/{slug}/view", response_class=JSONResponse)
+async def record_view(request: Request, slug: str, db: AsyncSession = Depends(get_db)):
+    """JS beacon endpoint: count a view after 5s read time, 24h cooldown."""
+    visitor_id = request.cookies.get("visitor_id")
+    if not visitor_id:
+        return JSONResponse({"recorded": False})
+
+    result = await db.execute(
+        select(Post).where(Post.slug == slug, Post.published == True)
+    )
+    post = result.scalar_one_or_none()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    # Check for existing view within last 24 hours
+    cutoff = datetime.utcnow() - timedelta(hours=24)
+    recent = await db.execute(
+        select(PostView).where(
+            PostView.post_id == post.id,
+            PostView.visitor_id == visitor_id,
+            PostView.created_at >= cutoff,
+        )
+    )
+    if recent.scalar_one_or_none():
+        return JSONResponse({"recorded": False, "view_count": post.view_count or 0})
+
+    db.add(PostView(post_id=post.id, visitor_id=visitor_id))
+    post.view_count = (post.view_count or 0) + 1
+    await db.commit()
+    return JSONResponse({"recorded": True, "view_count": post.view_count})
 
 
 @router.post("/blog/{slug}/like", response_class=JSONResponse)

@@ -37,7 +37,7 @@
     <header class="post-header">
         <h1>{{ post.title }}</h1>
         <p class="post-meta">
-            {{ post.created_at.strftime('%B %d, %Y') }} · {{ read_time }} min read · {{ post.view_count or 0 }} views
+            {{ post.created_at.strftime('%B %d, %Y') }} · {{ read_time }} min read · <span class="view-count">{{ post.view_count or 0 }}</span> views
         </p>
         {% if post.categories %}
         <div class="post-categories">
@@ -134,6 +134,19 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    /* ── View beacon (fires after 5s on page) ── */
+    setTimeout(() => {
+        fetch(`/blog/{{ post.slug }}/view`, {
+            method: 'POST',
+            credentials: 'same-origin'
+        }).then(r => r.json()).then(data => {
+            if (data.view_count !== undefined) {
+                const el = document.querySelector('.view-count');
+                if (el) el.textContent = data.view_count;
+            }
+        }).catch(() => {});
+    }, 5000);
+
     /* ── Like button ── */
     const btn = document.querySelector('.like-btn');
     if (btn) {
