@@ -3,25 +3,33 @@
 
 .PHONY: prod dev down logs shell migrate clean help
 
-# Docker compose command (use docker-compose for older versions)
+# Docker compose command
+# v1.29.2 has a ContainerConfig bug when recreating containers built by newer
+# Docker — always stop first so containers are created fresh, not recreated.
 DC := docker-compose
 
 # Production - single command to start everything
 prod:
 	@echo "🚀 Starting production server..."
+	-$(DC) down --remove-orphans 2>/dev/null || true
 	$(DC) up -d --build
 	@echo "✅ Site is live at http://localhost:8000"
 	@echo "📊 Admin panel at http://localhost:8000/admin"
 
-# Development - with hot reload
+# Development - with logs (Ctrl-C to stop)
 dev:
 	@echo "🔧 Starting development server..."
+	-$(DC) down --remove-orphans 2>/dev/null || true
 	$(DC) up --build
 
 # Stop all containers
 down:
 	@echo "🛑 Stopping containers..."
-	$(DC) down
+	-$(DC) down --remove-orphans 2>/dev/null || true
+	@docker stop portfolio_web portfolio_db 2>/dev/null || true
+	@docker rm   portfolio_web portfolio_db 2>/dev/null || true
+	@docker network rm portfolio_default 2>/dev/null || true
+	@echo "✅ Stopped"
 
 # View logs
 logs:
@@ -43,11 +51,16 @@ migration:
 # Clean up everything (containers, volumes, images)
 clean:
 	@echo "🧹 Cleaning up..."
-	$(DC) down -v --rmi local
+	@docker stop portfolio_web portfolio_db 2>/dev/null || true
+	@docker rm   portfolio_web portfolio_db 2>/dev/null || true
+	@docker network rm portfolio_default 2>/dev/null || true
+	$(DC) down -v --rmi local --remove-orphans 2>/dev/null || true
 	@echo "✅ Cleaned up"
 
 # Rebuild without cache
 rebuild:
+	@echo "🔨 Rebuilding..."
+	-$(DC) down --remove-orphans 2>/dev/null || true
 	$(DC) build --no-cache
 	$(DC) up -d
 

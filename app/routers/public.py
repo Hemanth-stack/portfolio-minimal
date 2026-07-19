@@ -1014,6 +1014,12 @@ async def sitemap_xml(db: AsyncSession = Depends(get_db)):
     return Response(content=xml, media_type="application/xml")
 
 
+@router.get("/tools/peft-visualizer", response_class=HTMLResponse)
+async def peft_visualizer():
+    """Serve the self-contained PEFT adapter visualizer."""
+    return FileResponse("static/peft-visualizer.html", media_type="text/html")
+
+
 @router.get("/{key}.txt")
 async def indexnow_verification(key: str):
     """Serve IndexNow API key verification file."""

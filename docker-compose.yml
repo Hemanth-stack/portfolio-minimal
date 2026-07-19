@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: portfolio_web
     ports:
-      - "8000:8000"
+      - "8002:8000"
     env_file: .env
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-hemanth}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-portfolio}
@@ -18,7 +18,7 @@ services:
       - ./credentials:/app/credentials:ro
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
       interval: 10s
       timeout: 5s
       retries: 3

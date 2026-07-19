@@ -15,18 +15,21 @@ DEFAULT_SECTIONS = {
             "title": "Hero Introduction",
             "content": """# Hi, I'm Hemanth 👋
 
-I'm an **AI & MLOps Engineer** with 3+ years of experience building high-performance LLM inference engines and distributed RAG pipelines.
+I'm an **AI & MLOps Engineer** with 3+ years of experience shipping production-grade NLP, LLM, and computer vision systems at scale.
 
-Currently working on LLM infrastructure at [EonForge](#), previously at [Zoho Corporation](#)."""
+Currently building CV and audio intelligence systems at [Arrise Solutions](#), previously at [EonForge (Logos Technologies)](#) and [Zoho Corporation](#)."""
         },
         "what_i_do": {
             "title": "What I Do",
             "content": """## What I do
 
-- Build production LLM systems (vLLM, CTranslate2, LoRA fine-tuning)
+- Build production LLM systems (vLLM, CTranslate2, LoRA/QLoRA fine-tuning)
 - Design RAG pipelines with hybrid search and knowledge graphs
+- Build computer vision pipelines for real-time stream analytics (YOLO, OpenCV, PyTorch)
 - Optimize inference latency and reduce cloud costs
-- Deploy scalable AI microservices on Kubernetes"""
+- Deploy scalable AI microservices on Kubernetes
+
+Try the [PEFT Visualizer](/tools/peft-visualizer), an interactive tool for exploring LoRA/QLoRA adapter mechanics."""
         },
         "cta": {
             "title": "Call to Action",
@@ -38,39 +41,43 @@ Looking for an AI/ML engineer? [Send me a message](/contact) or email me at [ihe
     "about": {
         "intro": {
             "title": "Introduction",
-            "content": """I'm **Hemanth Irivichetty**, a product-focused AI Engineer with 3+ years of experience architecting high-performance LLM inference engines and distributed RAG pipelines."""
+            "content": """I'm **Hemanth Irivichetty**, an AI and MLOps Engineer with 3+ years of experience shipping production-grade NLP, LLM, and computer vision systems at scale."""
         },
         "specialization": {
             "title": "What I Specialize In",
             "content": """## What I specialize in
 
-- **LLM Inference Optimization:** vLLM, CTranslate2, PagedAttention, quantization (Int8/AWQ)
-- **RAG Systems:** Hybrid search (Vector + Knowledge Graph), FAISS, cross-encoder re-ranking
-- **MLOps:** Kubernetes (EKS), Docker, CI/CD, Prometheus/Grafana monitoring
+- **LLM Inference Optimization:** vLLM, CTranslate2, PagedAttention, Tensor Parallelism, quantization (Int8/AWQ)
+- **RAG Systems:** Hybrid search (Vector + Knowledge Graph), FAISS, ChromaDB, cross-encoder re-ranking, RAGAS evaluation
+- **Computer Vision:** PyTorch, OpenCV, YOLO — pose estimation, stream analytics, image analysis pipelines
+- **MLOps:** Kubernetes (EKS), Docker, GitHub Actions, MLflow, DVC, Prometheus/Grafana, Weights & Biases
 - **Fine-tuning:** LoRA/QLoRA, PEFT techniques for domain adaptation"""
         },
         "experience": {
             "title": "Experience Summary",
             "content": """## Experience
 
-Currently at **EonForge (Logos Technologies LLC)** as an LLM & Vision Infrastructure Engineer, where I design RAG pipelines and OCR systems for insurance automation.
+Currently at **Arrise Solutions** as a Machine Learning Engineer, building computer vision and audio intelligence systems for live iGaming stream analytics — pose estimation pipelines and audio monitoring models for sound event detection.
 
-Previously at **Zoho Corporation** for 2.5 years, where I:
-- Increased LLM inference throughput from 20 to 80 tokens/sec (4x improvement)
+Previously at **EonForge (Logos Technologies LLC)** as an LLM & Vision Infrastructure Engineer (Jul 2025 – Mar 2026), where I designed the complete AI infrastructure for LumenCipher, an enterprise insurance CRM with RAG pipelines, OCR systems, and multi-agent orchestration.
+
+Earlier at **Zoho Corporation** (Jun 2023 – Jun 2025), where I:
+- Increased LLM inference throughput from 20 to 80 tokens/sec (4× improvement)
 - Reduced P99 latency by 40% and inference costs by 60%
+- Built and shipped five customer-facing NLP capabilities on a unified platform
 - Led migration from RNN/LSTM to Transformer-based architectures"""
         },
         "education": {
             "title": "Education",
             "content": """## Education
 
-B.Tech in Computer Science & Engineering from Sri Venkateswara College of Engineering (CGPA: 7.72)"""
+B.Tech in Computer Science & Engineering from Jawaharlal Nehru Technological University Anantapur (JNTUA) · CGPA: 7.72"""
         },
         "looking_for": {
             "title": "Currently Looking For",
             "content": """## Currently
 
-Looking for opportunities at MAANG companies and interesting freelance projects. If you're working on challenging AI/ML problems, [let's talk](/contact)."""
+Open to challenging AI/ML engineering roles and interesting freelance projects. If you're working on hard problems in LLM inference, RAG, or computer vision, [let's talk](/contact)."""
         }
     },
     "now": {
@@ -82,9 +89,10 @@ Looking for opportunities at MAANG companies and interesting freelance projects.
             "title": "Working On",
             "content": """## Working on
 
-- Building RAG pipelines with hybrid search at EonForge
-- OCR and document processing systems for insurance automation
-- Exploring multi-agent architectures"""
+- Building CV and audio intelligence systems for live iGaming streams at Arrise Solutions
+- Designing pose estimation pipelines for real-time posture tracking using PyTorch, OpenCV, and YOLO
+- Developing audio monitoring models for sound event detection and speech analysis
+- Exploring multi-agent architectures with CrewAI"""
         },
         "learning": {
             "title": "Learning",
@@ -114,7 +122,7 @@ Looking for opportunities at MAANG companies and interesting freelance projects.
         "header": {
             "title": "Header",
             "content": """# Hemanth Irivichetty
-**AI & MLOps Engineer**
+**Machine Learning & AI Engineer**
 
 [ihemanth.2001@gmail.com](mailto:ihemanth.2001@gmail.com) · +91 8500363606 · [LinkedIn](https://www.linkedin.com/in/hemanth-irivichetty/) · [GitHub](https://github.com/Hemanth-stack)"""
         },
@@ -122,55 +130,81 @@ Looking for opportunities at MAANG companies and interesting freelance projects.
             "title": "Professional Summary",
             "content": """## Professional Summary
 
-Product-focused AI Engineer with 3+ years of experience architecting high-performance LLM inference engines and distributed RAG pipelines. Expert in reducing production latency by 40% and inference costs by 60% through advanced quantization and memory optimization. Proven track record of migrating legacy NLP systems to Transformer-based architectures and deploying scalable, secure AI microservices on Kubernetes (EKS)."""
+AI and MLOps Engineer with 3+ years of experience shipping production-grade NLP and LLM systems at scale. At Zoho Corporation, I owned both sides of the AI stack — building customer-facing NLP features (grammar correction, summarization, question answering, sentiment analysis, and NL-to-SQL analytics) and engineering the inference platform that powered them, delivering a 4× throughput increase, 40% latency reduction, and 60% cost savings. I implemented tensor parallelism for multi-GPU inference, built full model CI/CD pipelines with automated retraining, and personally constructed custom CUDA-optimized data pipelines from scratch.
+
+At Arrise Solutions, I am building computer vision and audio intelligence systems for live game stream support — designing pose estimation pipelines for real-time posture tracking and developing audio monitoring models for continuous sound event detection and speech analysis across simultaneous live iGaming feeds."""
         },
         "skills": {
             "title": "Technical Skills",
             "content": """## Technical Skills
 
-- **GenAI & LLM Inference:** vLLM, CTranslate2, PagedAttention, Dynamic Batching, Quantization (Int8/AWQ), LoRA/QLoRA Fine-tuning
-- **RAG & Retrieval:** Hybrid Search (Vector + Knowledge Graph), FAISS, Cross-Encoders (BGE/Cohere), RAGAS Evaluation
-- **Models:** LLaMA 3.1, Qwen 2.5, FLAN-T5, LSTM, RNN
-- **MLOps & Cloud:** Kubernetes (EKS), Docker, AWS (EC2, S3), CI/CD (GitHub Actions), Prometheus, Grafana
-- **Backend Engineering:** Python (AsyncIO), FastAPI, Celery, SQLAlchemy (Async), Hybrid Encryption (RSA + Fernet), JWT/OAuth2
-- **Vision & OCR:** Tesseract OCR, Document Layout Analysis, Object Detection (YOLO)"""
+- **Core Languages:** Python (AsyncIO) · Bash · SQL · CUDA
+- **ML Frameworks:** PyTorch · TensorFlow · Hugging Face Transformers · PEFT · scikit-learn · NumPy · Pandas
+- **NLP Tasks:** Grammar Correction · Text Summarization · Question Answering · Sentiment Analysis · NL-to-SQL / NLA · Sequence Labeling
+- **LLM & Fine-Tuning:** LLaMA 3.1 · Qwen 2.5 · FLAN-T5 · GPT-4 · Mistral · LoRA · QLoRA · Prompt Engineering · RLHF (exposure)
+- **LLM Inference:** vLLM · PagedAttention · Continuous Batching · CTranslate2 · Int8 / AWQ Quantization · Tensor Parallelism · Triton
+- **RAG & Agents:** LangChain · FAISS · ChromaDB · Hybrid Search · Cross-Encoder Re-ranking · RAGAS · CrewAI · Multi-Agent Systems
+- **MLOps & CI/CD:** Kubernetes (EKS) · Docker · GitHub Actions · MLflow · Prometheus · Grafana · Weights & Biases · DVC
+- **Cloud & Infra:** AWS (EC2, S3) · Azure (Open AI) · GCP (Vertex AI) · Distributed Systems · Microservices
+- **Backend & Security:** FastAPI · Celery · SQLAlchemy (Async) · REST APIs · JWT / OAuth2 · Hybrid Encryption (RSA + Fernet)"""
+        },
+        "exp_arrise": {
+            "title": "Arrise Solutions Experience",
+            "content": """## Arrise Solutions (India) Pvt Ltd
+**Machine Learning Engineer** · India · Remote · Apr 2026 – Present
+
+- **Domain:** Building and deploying ML/CV models for Gaming and iGaming analytics, automating data-intensive processes previously performed manually
+- **Computer Vision:** Designing and experimenting with posture tracking and image analysis pipelines using PyTorch, OpenCV, and YOLO to extract actionable intelligence from gaming streams and visual data
+- **MLOps Infrastructure:** Establishing model lifecycle management with MLflow and DVC; containerizing workloads with Docker and Kubernetes for reproducible, scalable experiment and deployment workflows"""
         },
         "exp_eonforge": {
             "title": "EonForge Experience",
-            "content": """## EonForge (Logos Technologies LLC)
-**LLM & Vision Infrastructure Engineer** · Dubai, UAE / Remote · July 2025 – Present
+            "content": """## Logos Technologies LLC (EonForge)
+**LLM & Vision Infrastructure Engineer** · Dubai, UAE · Remote · Jul 2025 – Mar 2026
 
-- Designed Hybrid RAG system combining FAISS vector search with Knowledge Graph traversal for multi-hop reasoning
-- Built end-to-end document processing pipeline using Tesseract OCR with custom layout analysis
-- Architected orchestration layer for "LumenCipher" Insurance CRM with JWT/OAuth2 security
-- Developed intelligent agents for automated claims processing using SQLAlchemy (Async)"""
+- **System Architecture:** Designed the complete AI infrastructure for LumenCipher, an enterprise insurance CRM spanning RAG pipelines, OCR/vision systems, and multi-agent orchestration, all secured with JWT/OAuth2 authentication
+- **Hybrid RAG Pipeline:** Built a production RAG system combining FAISS vector search with Knowledge Graph traversal for multi-hop reasoning; added Cross-Encoder re-ranking (BGE) to boost retrieval precision, with end-to-end evaluation via BLEU and ROUGE metrics
+- **Document Intelligence:** Engineered an OCR and vision pipeline using Tesseract with custom layout analysis and YOLO-based object detection, enabling automated structured data extraction from complex insurance claim forms at hundreds of documents per day
+- **Agent Orchestration:** Architected the multi-agent workflow layer that automates claims processing end-to-end, integrating AI agents with the CRM database via SQLAlchemy Async, significantly reducing manual intervention in the claims lifecycle"""
         },
         "exp_zoho_mts": {
             "title": "Zoho MTS Experience",
             "content": """## Zoho Corporation
-**Member Technical Staff (NLP & AI)** · Chennai, TN · June 2023 – June 2025
+**Member of Technical Staff (NLP & AI)** · Chennai, India · On-site · Jun 2023 – Jun 2025
 
-- **4x Throughput:** Migrated to vLLM with Continuous Batching, increasing throughput from 20 to 80 tokens/sec
-- **40% Latency Reduction:** Implemented Int8 Quantization using CTranslate2, reducing P99 from 5s to 3s
-- **60% Cost Reduction:** Achieved through CPU offloading and optimized GEMM kernels
-- Fine-tuned FLAN-T5 and LLaMA 3.1 using LoRA/QLoRA for specialized tasks
-- Deployed on Kubernetes (EKS) with HPA based on GPU metrics and Prometheus/Grafana monitoring"""
+- **NLP Feature Ownership:** Built and shipped five customer-facing NLP capabilities: grammar correction, abstractive text summarization, extractive question answering, sentiment analysis, and NL-to-SQL using fine-tuned FLAN-T5, LLaMA 3.1, and custom models via LoRA/QLoRA; evaluated with BLEU/ROUGE scores and human review cycles
+- **NL-to-SQL / NLA Workflows:** Developed natural language query interfaces over Zoho's internal databases and BI dashboards, enabling business users to query structured data in plain English with schema-aware SQL generation and intent parsing
+- **4× Throughput Optimization:** Migrated the shared inference platform from a custom FastAPI queue to vLLM with Continuous Batching and PagedAttention, scaling throughput from 20 to 80 tokens/sec across all workloads simultaneously
+- **Distributed Inference:** Implemented tensor parallelism and model sharding for multi-GPU inference, allowing larger models to be served reliably under sustained high-concurrency production traffic
+- **Model CI/CD Pipeline:** Designed and owned the full model CI/CD pipeline with automated retraining triggers, evaluation gates, and deployment to Kubernetes (EKS) with HPA on GPU metrics ensuring zero-downtime rollouts
+- **Observability:** Set up centralized monitoring with Prometheus and Grafana covering GPU utilization, memory consumption, and per-feature request latency; configured MLflow and Weights & Biases for team-wide experiment tracking
+- **Security:** Secured on-premise to cloud model communication using Hybrid Encryption (RSA + Fernet symmetric keys), ensuring data integrity across the inference boundary"""
         },
         "exp_zoho_trainee": {
             "title": "Zoho Trainee Experience",
             "content": """## Zoho Corporation
-**Project Trainee (AI/ML)** · Chennai, TN · Oct 2022 – May 2023
+**Project Trainee (AI/ML)** · Chennai, India · On-site · Oct 2022 – May 2023
 
-- Led migration from RNN/LSTM to Transformer-based pipelines
-- Built data migration pipelines using Zoho Catalyst
-- Enforced code quality with Poetry and Pytest"""
+- **Architecture Migration:** Led the migration of core NLP workflows from RNN/LSTM architectures to Transformer-based pipelines, significantly improving sequence labeling accuracy across production datasets
+- **Data Engineering:** Built annotation interfaces and data migration pipelines using Zoho Catalyst, streamlining preprocessing of large-scale text corpora for model training jobs
+- **Engineering Standards:** Introduced Poetry for dependency management and Pytest-based unit and integration testing across the AI pipeline, raising the team's code quality baseline"""
+        },
+        "projects": {
+            "title": "Notable Projects",
+            "content": """## Notable Projects
+
+### GEC – Grammar Error Correction System
+End-to-end grammar correction pipeline fine-tuned on FLAN-T5 using LoRA on domain-specific text corpora. Includes a custom preprocessing pipeline, BLEU-based evaluation harness, and a FastAPI inference server. Demonstrates low-resource fine-tuning and production-ready NLP serving.
+
+### OLLM – Optimized LLM Inference Server
+A lightweight, production-oriented LLM inference server built on top of vLLM with custom batching strategies, Int8 quantization support, and a Prometheus metrics endpoint. Designed to benchmark throughput and latency trade-offs across different quantization and batching configurations."""
         },
         "education": {
             "title": "Education",
             "content": """## Education
 
 **B.Tech in Computer Science & Engineering**
-Sri Venkateswara College of Engineering · CGPA: 7.72"""
+Jawaharlal Nehru Technological University Anantapur (JNTUA) · Aug 2019 – Jul 2023 · CGPA: 7.72"""
         }
     },
     "contact": {

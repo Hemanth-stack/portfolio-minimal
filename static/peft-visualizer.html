@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEFT Adapter Visualizer  Interactive Transformer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* ── Portfolio Design Tokens ───────────────────────────── */
+:root {
+  --bg:       #FFF8E7;
+  --bg-alt:   #FFF3D0;
+  --bg-deep:  #F0E8CC;
+  --fg:       #1B1464;
+  --fg-light: #3D3580;
+  --fg-muted: #7A75A0;
+  --border:   #E8DFC8;
+  --border-strong: #C8BEA0;
+  --accent:   #E8DC3C;
+  --shadow-sm: 0 1px 2px rgba(27,20,100,.04), 0 2px 4px rgba(27,20,100,.04);
+  --shadow-md: 0 1px 2px rgba(27,20,100,.04), 0 4px 8px rgba(27,20,100,.06), 0 12px 24px rgba(27,20,100,.08);
+  --shadow-lg: 0 2px 4px rgba(27,20,100,.04), 0 8px 16px rgba(27,20,100,.08), 0 24px 48px rgba(27,20,100,.12);
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-disp: 'Playfair Display', Georgia, serif;
+  --radius: 8px;
+
+  /* State palette  light-mode friendly */
+  --frozen-bg:    #F0E8CC;
+  --frozen-bd:    #C4B8A0;
+  --frozen-tx:    #7A75A0;
+
+  --train-bg:     #FFFBEB;
+  --train-bd:     #D97706;
+  --train-tx:     #92400E;
+
+  --added-bg:     #ECFDF5;
+  --added-bd:     #059669;
+  --added-tx:     #064E3B;
+
+  --prompt-bg:    #F5F3FF;
+  --prompt-bd:    #7C3AED;
+  --prompt-tx:    #4C1D95;
+
+  --masked-bg:    #FEF2F2;
+  --masked-bd:    #DC2626;
+  --masked-tx:    #7F1D1D;
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font-sans);
+  font-size:16px;
+  line-height:1.6;
+  background:var(--bg);
+  color:var(--fg);
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.header{
+  padding:11px 24px;
+  background:var(--bg-alt);
+  border-bottom:2px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex-shrink:0;
+  box-shadow:var(--shadow-sm);
+}
+.header h1{
+  font-family:var(--font-disp);
+  font-size:21px;
+  font-weight:700;
+  color:var(--fg);
+  white-space:nowrap;
+  letter-spacing:-.01em;
+}
+.header h1 em{
+  font-style:italic;
+  font-weight:400;
+  color:var(--fg-light);
+}
+.header .sub{
+  font-size:14px;
+  color:var(--fg-muted);
+  font-weight:500;
+}
+.accent-dot{
+  display:inline-block;
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--accent);
+  border:1.5px solid var(--fg);
+  vertical-align:middle;
+  margin-right:6px;
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar{
+  width:262px;
+  flex-shrink:0;
+  background:var(--bg-alt);
+  border-right:2px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+}
+.search-wrap{
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  background:var(--bg);
+}
+.search-wrap input{
+  width:100%;
+  background:var(--bg);
+  border:2px solid var(--border);
+  border-radius:var(--radius);
+  padding:8px 12px;
+  color:var(--fg);
+  font-size:14px;
+  font-family:var(--font-sans);
+  outline:none;
+  transition:border-color .2s;
+}
+.search-wrap input::placeholder{color:var(--fg-muted)}
+.search-wrap input:focus{border-color:var(--fg)}
+.adapter-list{flex:1;overflow-y:auto;padding:6px 0}
+.adapter-list::-webkit-scrollbar{width:4px}
+.adapter-list::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
+.cat-label{
+  padding:10px 14px 4px;
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--fg-muted);
+  font-family:var(--font-sans);
+}
+.abtn{
+  display:flex;align-items:center;gap:9px;
+  width:100%;padding:8px 14px;
+  background:none;border:none;
+  border-left:3px solid transparent;
+  cursor:pointer;color:var(--fg-light);
+  font-size:14px;font-family:var(--font-sans);
+  font-weight:500;
+  text-align:left;transition:all .15s;
+}
+.abtn:hover{background:var(--bg-deep);color:var(--fg)}
+.abtn.active{
+  background:var(--bg-deep);
+  color:var(--fg);
+  border-left-color:var(--fg);
+}
+.abtn.hidden{display:none}
+.abtn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1.5px solid rgba(0,0,0,.15)}
+
+/* ── Transformer panel ───────────────────────────────────── */
+.tfm-panel{
+  flex:1;overflow:hidden;
+  display:flex;flex-direction:column;
+  align-items:center;
+  padding:16px 16px 10px;
+  gap:10px;
+  background:var(--bg);
+  min-width:0;
+}
+.tfm-title{
+  font-size:11px;font-weight:700;
+  color:var(--fg-muted);
+  text-transform:uppercase;letter-spacing:.1em;
+  font-family:var(--font-sans);
+  flex-shrink:0;
+}
+.tfm-scroll{
+  flex:1;overflow-y:auto;
+  width:100%;display:flex;
+  justify-content:center;
+}
+.tfm-scroll::-webkit-scrollbar{width:4px}
+.tfm-scroll::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
+.tfm{
+  display:flex;flex-direction:column;
+  align-items:center;gap:0;
+  width:325px;padding-bottom:20px;
+}
+.conn{width:2px;height:18px;background:var(--border-strong);flex-shrink:0;margin:0 auto}
+.conn.sm{height:9px}
+
+/* ── Component boxes ─────────────────────────────────────── */
+.tc{
+  width:100%;
+  border:1.5px solid var(--border-strong);
+  border-radius:var(--radius);
+  padding:11px 15px;
+  background:var(--bg);
+  transition:all .35s ease;
+  position:relative;
+  cursor:default;
+  flex-shrink:0;
+  box-shadow:var(--shadow-sm);
+}
+.tc .cn{
+  font-size:14px;font-weight:600;
+  color:var(--fg-light);
+  transition:color .35s;
+  font-family:var(--font-sans);
+}
+.tc .cs{
+  font-size:12px;color:var(--fg-muted);
+  margin-top:2px;font-family:var(--font-sans);
+}
+.tblock{
+  width:100%;
+  border:2px solid var(--border);
+  border-radius:10px;
+  padding:13px;
+  background:var(--bg-alt);
+  display:flex;flex-direction:column;
+  align-items:center;gap:0;flex-shrink:0;
+  box-shadow:var(--shadow-sm);
+}
+.tblocklabel{
+  font-size:11px;font-weight:700;
+  color:var(--fg-muted);
+  text-transform:uppercase;letter-spacing:.1em;
+  margin-bottom:10px;align-self:flex-start;
+  font-family:var(--font-sans);
+}
+.attn-row,.ffn-row{display:flex;gap:6px;width:100%}
+.attn-row .tc,.ffn-row .tc{flex:1;padding:9px 6px;text-align:center}
+.attn-row .tc .cn,.ffn-row .tc .cn{font-size:13px}
+.attn-row .tc .cs,.ffn-row .tc .cs{font-size:10px}
+.resid{
+  font-size:11px;color:var(--fg-muted);
+  padding:5px 0;align-self:flex-start;
+  padding-left:4px;font-family:var(--font-sans);
+}
+.input-tok{
+  text-align:center;
+  background:var(--bg-deep)!important;
+  border-style:dashed!important;
+  border-color:var(--border-strong)!important;
+  cursor:default;
+}
+.input-tok .cn{color:var(--fg-muted)!important}
+
+/* ── State styles ─────────────────────────────────────────── */
+.s-frozen{background:var(--frozen-bg)!important;border-color:var(--frozen-bd)!important}
+.s-frozen .cn{color:var(--frozen-tx)!important}
+
+.s-trainable{background:var(--train-bg)!important;border-color:var(--train-bd)!important;animation:ptrain 2s infinite}
+.s-trainable .cn{color:var(--train-tx)!important}
+
+.s-added{background:var(--added-bg)!important;border-color:var(--added-bd)!important;animation:padd 2s infinite}
+.s-added .cn{color:var(--added-tx)!important}
+
+.s-prompt{background:var(--prompt-bg)!important;border-color:var(--prompt-bd)!important;animation:pprm 2s infinite}
+.s-prompt .cn{color:var(--prompt-tx)!important}
+
+.s-masked{background:var(--masked-bg)!important;border-color:var(--masked-bd)!important;animation:pmsk 2s infinite}
+.s-masked .cn{color:var(--masked-tx)!important}
+
+@keyframes ptrain{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,0)}50%{box-shadow:0 0 0 6px rgba(217,119,6,.15)}}
+@keyframes padd{0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,0)}50%{box-shadow:0 0 0 6px rgba(5,150,105,.15)}}
+@keyframes pprm{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}50%{box-shadow:0 0 0 6px rgba(124,58,237,.15)}}
+@keyframes pmsk{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0)}50%{box-shadow:0 0 0 6px rgba(220,38,38,.12)}}
+
+/* ── Badges on components ────────────────────────────────── */
+.tc-badge{
+  position:absolute;top:-7px;right:8px;
+  font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:4px;
+  white-space:nowrap;pointer-events:none;
+  border:1px solid rgba(0,0,0,.12);
+  font-family:var(--font-sans);
+  letter-spacing:-.01em;
+}
+
+/* ── Legend ──────────────────────────────────────────────── */
+.legend{
+  display:flex;gap:14px;flex-wrap:wrap;
+  justify-content:center;flex-shrink:0;
+}
+.li{
+  display:flex;align-items:center;gap:5px;
+  font-size:12px;color:var(--fg-muted);
+  font-family:var(--font-sans);font-weight:500;
+}
+.ld{width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.1)}
+
+/* ── Info panel ──────────────────────────────────────────── */
+.info-panel{
+  width:412px;flex-shrink:0;
+  background:var(--bg);
+  border-left:2px solid var(--border);
+  overflow-y:auto;padding:22px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.info-panel::-webkit-scrollbar{width:4px}
+.info-panel::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:2px}
+.placeholder{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:12px;color:var(--fg-muted);
+  font-size:14px;text-align:center;
+  min-height:200px;font-family:var(--font-sans);
+  line-height:1.6;
+}
+.placeholder svg{opacity:.25}
+.placeholder strong{
+  font-family:var(--font-disp);
+  font-size:18px;color:var(--fg-light);
+  font-weight:700;
+}
+
+/* Info content */
+.info-name{
+  font-family:var(--font-disp);
+  font-size:25px;font-weight:700;
+  color:var(--fg);line-height:1.15;
+}
+.info-fn{
+  font-size:14px;color:var(--fg-muted);
+  margin-top:3px;font-style:italic;
+  font-family:var(--font-disp);
+}
+.info-meta{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.mtag{
+  padding:3px 10px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  font-family:var(--font-sans);
+  border:1px solid rgba(0,0,0,.1);
+}
+.isec{
+  border-top:2px solid var(--border);
+  padding-top:14px;
+}
+.isec h3{
+  font-family:var(--font-disp);
+  font-size:14px;font-weight:700;
+  color:var(--fg);margin-bottom:8px;
+  letter-spacing:-.01em;
+}
+.idesc{
+  font-size:14px;color:var(--fg-light);
+  line-height:1.7;font-family:var(--font-sans);
+}
+.formula{
+  background:#1e1e1e;
+  border:1px solid #333;
+  border-radius:var(--radius);
+  padding:10px 14px;
+  font-family:"SF Mono",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:13px;color:#86efac;
+  margin:9px 0;word-break:break-all;line-height:1.6;
+}
+
+/* Param bar */
+.pbar-wrap{margin:8px 0}
+.pbar-labels{
+  display:flex;justify-content:space-between;
+  font-size:12px;color:var(--fg-muted);
+  margin-bottom:4px;font-family:var(--font-sans);
+}
+.pbar{
+  height:9px;border-radius:4px;
+  background:var(--bg-deep);overflow:hidden;
+  border:1px solid var(--border);
+}
+.pbar-fill{height:100%;border-radius:4px;transition:width .7s ease}
+.pdetail{
+  font-size:13px;color:var(--fg-muted);
+  margin-top:9px;line-height:1.65;
+  font-family:var(--font-sans);
+}
+.pdetail strong{color:var(--fg-light)}
+
+/* Affected layers */
+.aff-list{display:flex;flex-direction:column;gap:6px}
+.aff-item{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--fg-light);
+  font-family:var(--font-sans);
+}
+.aff-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;border:1.5px solid rgba(0,0,0,.1)}
+
+/* Category badge colours (info panel tags) */
+.c-low-rank{background:#EEF2FF;color:#3730A3;border-color:#C7D2FE}
+.c-prompt{background:#F5F3FF;color:#5B21B6;border-color:#DDD6FE}
+.c-orthogonal{background:#E0F2FE;color:#0369A1;border-color:#BAE6FD}
+.c-sparse{background:#FEF2F2;color:#991B1B;border-color:#FED7AA}
+.c-mixture{background:#FFFBEB;color:#92400E;border-color:#FDE68A}
+.c-activation{background:#ECFDF5;color:#065F46;border-color:#A7F3D0}
+
+/* Sidebar dot colours */
+.d-low-rank{background:#3730A3}
+.d-prompt{background:#7C3AED}
+.d-orthogonal{background:#0369A1}
+.d-sparse{background:#DC2626}
+.d-mixture{background:#D97706}
+.d-activation{background:#059669}
+
+/* ── Hamburger toggle (hidden on desktop) ──────────────── */
+.menu-toggle{
+  display:none;
+  align-items:center;justify-content:center;
+  background:none;
+  border:2px solid var(--border);
+  border-radius:var(--radius);
+  padding:5px 9px;
+  cursor:pointer;
+  color:var(--fg);
+  font-size:17px;line-height:1;
+  flex-shrink:0;
+  transition:background .15s;
+}
+.menu-toggle:hover{background:var(--bg-deep)}
+.menu-toggle.open{background:var(--bg-deep);border-color:var(--border-strong)}
+
+/* Mobile overlay backdrop */
+.mob-backdrop{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(27,20,100,.25);
+  z-index:40;
+  backdrop-filter:blur(1px);
+}
+.mob-backdrop.visible{display:block}
+
+/* ── Tablet (≤1100px) ──────────────────────────────────── */
+@media(max-width:1100px){
+  .sidebar{width:220px}
+  .info-panel{width:340px;padding:16px}
+  .info-name{font-size:21px}
+}
+
+/* ── Small tablet (≤820px): drop info panel below diagram ─ */
+@media(max-width:820px){
+  html,body{height:auto;overflow-y:auto}
+  body{flex-direction:column;height:auto;overflow:visible}
+  .layout{flex-direction:column;overflow:visible;flex:none}
+
+  .sidebar{
+    width:260px;
+    position:fixed;top:0;left:0;bottom:0;
+    z-index:50;
+    transform:translateX(-100%);
+    transition:transform .28s ease;
+    overflow-y:auto;
+    box-shadow:var(--shadow-lg);
+  }
+  .sidebar.open{transform:translateX(0)}
+
+  .menu-toggle{display:flex}
+  .header .sub{display:none}
+
+  .tfm-panel{
+    flex:none;height:auto;
+    overflow:visible;
+    padding:12px 12px 8px;
+    min-height:0;
+  }
+  .tfm-scroll{overflow:visible;height:auto;flex:none}
+  .tfm{width:100%;max-width:310px}
+
+  .info-panel{
+    width:100%;
+    border-left:none;
+    border-top:2px solid var(--border);
+    overflow-y:visible;
+    padding:18px 16px;
+  }
+}
+
+/* ── Mobile (≤520px): tighten diagram further ──────────── */
+@media(max-width:520px){
+  .header{padding:8px 12px;gap:10px}
+  .header h1{font-size:17px}
+
+  .tfm-panel{padding:10px 8px 6px}
+  .tfm{max-width:100%}
+  .tc{padding:8px 10px}
+  .tc .cn{font-size:13px}
+  .tc .cs{font-size:11px}
+  .tblock{padding:10px 8px}
+
+  .attn-row,.ffn-row{gap:4px}
+  .attn-row .tc,.ffn-row .tc{padding:7px 4px}
+  .attn-row .tc .cn,.ffn-row .tc .cn{font-size:11px}
+  .attn-row .tc .cs,.ffn-row .tc .cs{font-size:9px}
+
+  .legend{gap:8px}
+  .li{font-size:11px}
+  .ld{width:9px;height:9px}
+
+  .info-panel{padding:14px 12px}
+  .info-name{font-size:20px}
+  .info-fn{font-size:13px}
+  .idesc{font-size:13px}
+  .formula{font-size:12px;padding:8px 10px}
+}
+</style>
+</head>
+<body>
+<div class="mob-backdrop" id="mobBackdrop" onclick="closeSidebar()"></div>
+
+<div class="header">
+  <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()" aria-label="Toggle adapter list">&#9776;</button>
+  <h1><span class="accent-dot"></span>PEFT <em>Adapter</em> Visualiser</h1>
+  <span class="sub">Interactive Transformer Architecture &middot; 40 Adapter Types &middot; Click any adapter to explore</span>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="search-wrap">
+      <input type="text" id="srch" placeholder="Search adapters…" oninput="filterAdapters(this.value)">
+    </div>
+    <div class="adapter-list" id="adapterList"></div>
+  </div>
+
+  <!-- Transformer diagram -->
+  <div class="tfm-panel">
+    <div class="tfm-title">Transformer Architecture</div>
+    <div class="tfm-scroll">
+      <div class="tfm" id="tfm">
+        <div class="tc input-tok">
+          <div class="cn">Input Tokens</div>
+          <div class="cs">Token sequence [ t₁ t₂ t₃ … ]</div>
+        </div>
+        <div class="conn"></div>
+
+        <div class="tc" id="token_embed">
+          <div class="cn">Embeddings</div>
+          <div class="cs">Token + Positional Encoding</div>
+        </div>
+        <div class="conn"></div>
+
+        <div class="tblock">
+          <div class="tblocklabel">Transformer Block × N layers</div>
+
+          <div class="tc" id="ln1">
+            <div class="cn">LayerNorm₁</div>
+          </div>
+          <div class="conn sm"></div>
+
+          <div class="attn-row">
+            <div class="tc" id="q_proj"><div class="cn">Q</div><div class="cs">Query proj</div></div>
+            <div class="tc" id="k_proj"><div class="cn">K</div><div class="cs">Key proj</div></div>
+            <div class="tc" id="v_proj"><div class="cn">V</div><div class="cs">Value proj</div></div>
+          </div>
+          <div class="conn sm"></div>
+
+          <div class="tc" id="attn_core">
+            <div class="cn">Multi-Head Attention</div>
+            <div class="cs">Scaled dot-product + softmax</div>
+          </div>
+          <div class="conn sm"></div>
+
+          <div class="tc" id="o_proj">
+            <div class="cn">Output Projection</div>
+            <div class="cs">Concat heads → model dim</div>
+          </div>
+          <div class="resid">⊕ Residual + LayerNorm</div>
+
+          <div class="tc" id="ln2">
+            <div class="cn">LayerNorm₂</div>
+          </div>
+          <div class="conn sm"></div>
+
+          <div class="ffn-row">
+            <div class="tc" id="ffn_up"><div class="cn">Up/Gate</div><div class="cs">×4 expand</div></div>
+            <div class="tc" id="ffn_act"><div class="cn">Act</div><div class="cs">GELU/SiLU</div></div>
+            <div class="tc" id="ffn_down"><div class="cn">Down</div><div class="cs">compress</div></div>
+          </div>
+          <div class="resid">⊕ Residual + LayerNorm</div>
+        </div>
+        <div class="conn"></div>
+
+        <div class="tc" id="final_ln">
+          <div class="cn">Final LayerNorm</div>
+        </div>
+        <div class="conn"></div>
+
+        <div class="tc" id="lm_head">
+          <div class="cn">LM Head / Output</div>
+          <div class="cs">Vocab projection (logits)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:var(--frozen-bg);border-color:var(--frozen-bd)"></div>Frozen</div>
+      <div class="li"><div class="ld" style="background:var(--train-bg);border-color:var(--train-bd)"></div>Trainable</div>
+      <div class="li"><div class="ld" style="background:var(--added-bg);border-color:var(--added-bd)"></div>Added Adapter</div>
+      <div class="li"><div class="ld" style="background:var(--prompt-bg);border-color:var(--prompt-bd)"></div>Prompt / Prefix</div>
+      <div class="li"><div class="ld" style="background:var(--masked-bg);border-color:var(--masked-bd)"></div>Sparse / Selected</div>
+    </div>
+  </div>
+
+  <!-- Info panel -->
+  <div class="info-panel" id="infoPanel">
+    <div class="placeholder">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+      <strong>Select an adapter</strong>
+      <div>Click any adapter on the left to visualise<br>which transformer layers it trains,<br>modifies, or extends</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const bd=document.getElementById('mobBackdrop');
+  const btn=document.getElementById('menuToggle');
+  const open=sb.classList.toggle('open');
+  bd.classList.toggle('visible',open);
+  btn.classList.toggle('open',open);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobBackdrop').classList.remove('visible');
+  document.getElementById('menuToggle').classList.remove('open');
+}
+
+const CATS = [
+  {id:'low-rank',   label:'Low-Rank Decomposition'},
+  {id:'prompt',     label:'Prompt / Prefix'},
+  {id:'orthogonal', label:'Orthogonal'},
+  {id:'sparse',     label:'Sparse / Subspace'},
+  {id:'mixture',    label:'Mixture / Multi-task'},
+  {id:'activation', label:'Activation / Bias'},
+];
+
+const LAYER_NAMES = {
+  token_embed:'Embedding layer', ln1:'LayerNorm 1',
+  q_proj:'Q projection', k_proj:'K projection', v_proj:'V projection',
+  attn_core:'Attention core', o_proj:'Output projection', ln2:'LayerNorm 2',
+  ffn_up:'FFN Up/Gate', ffn_act:'FFN Activation', ffn_down:'FFN Down',
+  final_ln:'Final LayerNorm', lm_head:'LM Head',
+};
+
+const ADAPTERS = [
+// ── LOW-RANK ──────────────────────────────────────────────────────────────────
+{id:'lora', name:'LoRA', fullName:'Low-Rank Adaptation', year:2021, cat:'low-rank',
+ pct:0.5, pctLabel:'~0.1–1%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added'},
+ badge:{q_proj:'A·B',k_proj:'A·B',v_proj:'A·B',o_proj:'A·B'},
+ simple:'Inserts two tiny "helper matrices" (A and B) in parallel with frozen attention weights. Only A and B are trained  the original weights never change.',
+ desc:'LoRA freezes all pre-trained weights and injects trainable rank-decomposition matrix pairs into each targeted layer. The update ΔW = BA where B ∈ ℝ^{d×r} and A ∈ ℝ^{r×k}, with rank r ≪ min(d, k).',
+ mech:'Two matrices A (Gaussian init) and B (zero init) run in parallel to the frozen weight. Output = W₀x + BAx. At inference BA can be merged into W₀ at zero cost. Typically applied to Q, K, V, O projections.',
+ formula:'h = W₀x + (B·A)x,   ΔW = B·A,   rank(ΔW) = r',
+ params:'For LLaMA-7B r=8 targeting Q,K,V,O: ≈4.2M trainable (0.06%)'},
+
+{id:'adalora', name:'AdaLoRA', fullName:'Adaptive Low-Rank Adaptation', year:2023, cat:'low-rank',
+ pct:0.5, pctLabel:'~0.1–1% (adaptive)',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'PΛQ',v_proj:'PΛQ'},
+ simple:'Like LoRA but smarter  it automatically gives more parameters to important layers and fewer to unimportant ones by using SVD decomposition.',
+ desc:'AdaLoRA parameterizes updates as SVD decomposition (PΛQ instead of BA) and uses importance scores to dynamically redistribute the rank budget across layers during training.',
+ mech:'Three phases: (1) warm-up  all ranks equal; (2) pruning  importance scores (EMA of gradient × weight product) rank singular values; low-importance ones are zeroed; (3) fine-tune  fixed pruned structure. Budget is constant but shifts to high-importance matrices.',
+ formula:'ΔW = P·diag(λ)·Q,   rank pruned by importance scores',
+ params:'Same total budget as LoRA, but dynamically distributed. Low-importance layers shrink to rank 0.'},
+
+{id:'adamss', name:'AdaMSS', fullName:'Adaptive Multi-Subspace Approach', year:2024, cat:'low-rank',
+ pct:0.3, pctLabel:'~0.05–0.5%',
+ hi:{q_proj:'added',v_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'K subspaces',v_proj:'K subspaces'},
+ simple:'Splits each weight matrix into multiple subspaces using SVD, trains each subspace independently, then optionally prunes the less useful ones.',
+ desc:'AdaMSS decomposes weight matrices via SVD, clusters the decomposed space into K subspaces using K-Means, and applies independent low-rank adapters within each subspace. Adaptive Subspace Allocation (ASA) prunes subspaces by gradient importance.',
+ mech:'SVD gives singular vectors → K-Means clusters them into K groups → each group gets an A/B adapter pair. ASA tracks importance via EMA of gradient×weight and globally prunes the weakest subspaces every mask_interval steps.',
+ formula:'W ≈ Σᵢ Uᵢ Sᵢ Vᵢᵀ,   ΔWᵢ = BᵢAᵢ per subspace',
+ params:'num_subspaces × subspace_rank × (in+out) per layer. ASA can reduce final count by 90%+'},
+
+{id:'gralora', name:'GraLoRA', fullName:'Granular Low-Rank Adaptation', year:2025, cat:'low-rank',
+ pct:0.5, pctLabel:'~0.1–1% (same as LoRA)',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'k² blocks',v_proj:'k² blocks'},
+ simple:'Divides each weight matrix into a grid of smaller blocks and gives each block its own tiny adapter, preventing interference between unrelated channels.',
+ desc:'GraLoRA partitions weight matrices into a k×k grid of sub-blocks, assigning independent low-rank adapters to each block. This prevents gradient entanglement across different input/output channel groups.',
+ mech:'Weight W split into k² blocks of size d/k × k/k. Each block gets adapter (Aᵢⱼ, Bᵢⱼ) with rank r/k. Same total params as LoRA but localized  extreme activations in one channel cannot distort gradients of unrelated channels.',
+ formula:'ΔW = block_diag(B₁₁A₁₁, …, BₖₖAₖₖ)',
+ params:'k² × 2 × (r/k) × (d/k + k/k) ≈ same as LoRA r globally'},
+
+{id:'loha', name:'LoHa', fullName:'Low-Rank Hadamard Product', year:2023, cat:'low-rank',
+ pct:0.8, pctLabel:'~0.2–2%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'(A₁B₁)⊙(A₂B₂)',v_proj:'Hadamard'},
+ simple:'Uses a Hadamard (element-wise) product of two low-rank decompositions instead of a single one, capturing richer interactions.',
+ desc:'LoHa parameterizes the weight update as the element-wise (Hadamard) product of two low-rank matrix products: ΔW = (A₁B₁) ⊙ (A₂B₂). Allows richer representations than a single product.',
+ mech:'Four trainable matrices: A₁,A₂ ∈ ℝ^{r×k} and B₁,B₂ ∈ ℝ^{d×r}. The Hadamard product of the two low-rank products creates an update that captures cross-channel interactions. Supports Tucker decomposition for 4D Conv weights.',
+ formula:'ΔW = (B₁·A₁) ⊙ (B₂·A₂)',
+ params:'4 × r × (d+k) per layer (2× LoRA), but higher expressivity per parameter'},
+
+{id:'lokr', name:'LoKr', fullName:'Low-Rank Kronecker Product', year:2023, cat:'low-rank',
+ pct:0.5, pctLabel:'~0.05–0.5%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'A⊗B',v_proj:'Kronecker'},
+ simple:'Uses the Kronecker product (a structured "outer product of matrices") to represent the weight update with very few parameters.',
+ desc:'LoKr parameterizes updates using the Kronecker product of two smaller matrices, producing a structured high-rank update. Originally designed for diffusion model UNet fine-tuning.',
+ mech:'ΔW = A ⊗ B where A ∈ ℝ^{m×n}, B ∈ ℝ^{p×q}, giving ΔW ∈ ℝ^{mp×nq}. The Kronecker structure is inherently full-rank if A and B are full-rank, unlike LoRA\'s rank-r constraint.',
+ formula:'ΔW = A ⊗ B   (Kronecker product)',
+ params:'m×n + p×q where mp=d_out, nq=d_in. Far fewer than d_out×d_in for full FT'},
+
+{id:'vera', name:'VeRA', fullName:'Vector-Based Random Matrix Adaptation', year:2023, cat:'low-rank',
+ pct:0.05, pctLabel:'~0.01–0.05%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added'},
+ badge:{q_proj:'λ_b·B·λ_d·A',v_proj:'λ vectors'},
+ simple:'Uses one pair of frozen random matrices shared across all layers. Each layer only trains two tiny scaling vectors  one for rows, one for the bottleneck.',
+ desc:'VeRA shares one pair of random matrices (A, B) frozen across all layers and trains only tiny per-layer diagonal scaling vectors (λ_b, λ_d). Extreme parameter efficiency.',
+ mech:'ΔW = Λ_b · B · Λ_d · A where B,A are shared frozen random matrices, and Λ_b (d-vec), Λ_d (r-vec) are per-layer diagonal scalings. Only scaling vectors stored per layer.',
+ formula:'ΔW = diag(λ_b) · B · diag(λ_d) · A',
+ params:'2×(d+r) per layer. LLaMA-7B r=256: ≈1.4M (0.02%) vs LoRA r=256: ≈800M'},
+
+{id:'pvera', name:'PVeRA', fullName:'Probabilistic VeRA', year:2024, cat:'low-rank',
+ pct:0.06, pctLabel:'~0.02–0.08%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added'},
+ badge:{q_proj:'μ,σ → sample',v_proj:'Probabilistic'},
+ simple:'Like VeRA, but learns a probability distribution for the scaling vectors instead of fixed values, enabling uncertainty estimation at inference.',
+ desc:'PVeRA extends VeRA by making scaling vectors probabilistic  learning mean and variance parameters to represent a distribution. Enables Monte Carlo confidence interval estimation.',
+ mech:'Like VeRA but each λ_b, λ_d vector has mean μ and variance σ (reparameterization trick). At inference, can use mean (deterministic) or draw samples for uncertainty bounds.',
+ formula:'ΔW = diag(sample(μ_b, σ_b)) · B · diag(sample(μ_d, σ_d)) · A',
+ params:'4×(d+r) per layer (mean+variance for each vector). Still far fewer than LoRA.'},
+
+{id:'vblora', name:'VB-LoRA', fullName:'Vector Bank Low-Rank Adaptation', year:2024, cat:'low-rank',
+ pct:0.05, pctLabel:'~0.01% stored',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'top-k bank',v_proj:'shared bank'},
+ simple:'All adapter matrices across all layers are composed from top-k combinations of vectors in a single shared "vector bank", reducing storage by 250×.',
+ desc:'VB-LoRA decomposes all LoRA matrices globally into sub-vectors selected from a shared vector bank via differentiable top-k selection. For Llama2-13B, uses 0.4% of LoRA\'s stored parameters.',
+ mech:'Global vector bank of num_vectors × vector_length. Each row of each LoRA matrix A/B is composed as a weighted top-k sum of bank vectors (logit-based, differentiable). Checkpoint: ~2.5MB for Llama2-7B.',
+ formula:'A_row = Σᵢ topk_weight(i) · bank[i]   (differentiable)',
+ params:'num_vectors × vector_length (shared) + topk×2 logits per matrix. 250× smaller checkpoint than LoRA'},
+
+{id:'hira', name:'HiRA', fullName:'Hadamard High-Rank Adaptation', year:2024, cat:'low-rank',
+ pct:0.5, pctLabel:'~0.1–1%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'W₀⊙(BA)',v_proj:'Hadamard mod'},
+ simple:'Instead of adding a low-rank update, it multiplies the existing weight by a low-rank modulation  leveraging full-rank pretrained knowledge.',
+ desc:'HiRA achieves high-rank updates by applying Hadamard (element-wise) modulation ON the original weight matrix: W\' = W₀ + W₀ ⊙ (BA). This inherits the full rank of W₀.',
+ mech:'ΔW = W₀ ⊙ (B·A) where B,A are low-rank factors. Since W₀ is full-rank, the Hadamard product ΔW can be full-rank even though B·A is rank-r. Re-uses pretrained knowledge for the adaptation direction.',
+ formula:"W' = W₀ + W₀ ⊙ (B·A),   rank(ΔW) = rank(W₀)",
+ params:'2rd per layer  same count as LoRA but effective rank = rank(W₀) not r'},
+
+{id:'randlora', name:'RandLoRA', fullName:'Random Basis Full-Rank Adaptation', year:2025, cat:'low-rank',
+ pct:0.1, pctLabel:'~0.02–0.1%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added'},
+ badge:{q_proj:'Σγᵢ·BᵢΛᵢAᵢ',v_proj:'full-rank'},
+ simple:'Uses many frozen random low-rank matrices and only trains small scaling vectors for each  achieving a full-rank weight update with very few parameters.',
+ desc:'RandLoRA performs full-rank updates using learned linear combinations of multiple frozen random low-rank bases. Only two diagonal scaling matrices (vectors) per layer are trainable.',
+ mech:'ΔW = Σᵢ (γᵢ × Bᵢ × Λᵢ × Aᵢ) where Aᵢ,Bᵢ are frozen random matrices and Λᵢ,γᵢ are trainable diagonal matrices. With enough bases (sum of ranks ≥ full rank), the update spans the full weight space.',
+ formula:'ΔW = Σᵢ diag(γᵢ)·Bᵢ·diag(λᵢ)·Aᵢ',
+ params:'2×(d+k)×num_bases per layer, but num_bases compensates for reduced rank  total ≈ VeRA'},
+
+{id:'delora', name:'DeLoRA', fullName:'Decoupled Low-Rank Adaptation', year:2025, cat:'low-rank',
+ pct:0.5, pctLabel:'~0.1–1%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'‖ΔW‖≤λ',v_proj:'bounded norm'},
+ simple:'LoRA but with a Frobenius norm boundary enforced on the weight update  decoupling "direction of change" from "strength of change" for more stable training.',
+ desc:'DeLoRA normalizes low-rank matrices and applies a learnable scale bounded by λ, preventing catastrophic shifts from pretrained weights. More robust to hyperparameter choices.',
+ mech:'ΔW = s × normalize(B) × normalize(A) where s = λ·tanh(learnable scalar) bounds the Frobenius norm. Decouples angular learning from magnitude scaling. Requires 10–100× higher LR than LoRA.',
+ formula:"ΔW = λ·tanh(α) · (B/‖B‖) · (A/‖A‖)",
+ params:'Same as LoRA (2rd) + 1 scalar per layer for boundary λ. Near-identical parameter count.'},
+
+{id:'fourierft', name:'FourierFT', fullName:'Fourier Transform Fine-Tuning', year:2024, cat:'low-rank',
+ pct:0.1, pctLabel:'~0.01–0.2%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'n_freq coeffs',v_proj:'IDFT→ΔW'},
+ simple:'Trains a small set of Fourier frequency coefficients  the IDFT converts them back to a full high-rank weight update.',
+ desc:'FourierFT learns sparse updates in the 2D Fourier domain of weight matrices. Only n_frequency coefficients (randomly positioned) are trained per layer, mapped back via Inverse DFT.',
+ mech:'n spectral coefficients at random positions in the 2D DFT space are trainable. IDFT reconstructs ΔW from sparse spectral representation, producing a high-rank but parameter-efficient update.',
+ formula:'ΔW = IDFT( sparse_spectral_mask ⊙ Θ )',
+ params:'n_frequency complex numbers per layer. Can be as few as 1 vs d×k for full FT'},
+
+{id:'waveft', name:'WaveFT', fullName:'Wavelet Fine-Tuning', year:2025, cat:'low-rank',
+ pct:0.08, pctLabel:'~0.001–0.2%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'n_freq wavelet',v_proj:'IDWT→ΔW'},
+ simple:'Same idea as FourierFT but uses wavelets instead of Fourier transforms, offering multi-scale frequency decomposition for the weight update.',
+ desc:'WaveFT learns sparse updates in the wavelet domain of weight matrices. n_frequency wavelet coefficients at random positions are trained per layer, mapped back via Inverse DWT.',
+ mech:'2D DWT applied to ΔW space → n_frequency positions randomly selected as trainable. During forward pass, IDWT reconstructs ΔW from sparse wavelet coefficients. Supports Haar, Daubechies, Symlets, etc.',
+ formula:'ΔW = scale · IDWT( sparse_wavelet_coeffs )',
+ params:'n_frequency real numbers per layer. Can be far smaller than LoRA\'s minimum (r×(d+k))'},
+
+{id:'miss', name:'MiSS', fullName:'Matrix Shard Sharing', year:2024, cat:'low-rank',
+ pct:0.5, pctLabel:'~0.1–1%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'shared shard',v_proj:'replicated'},
+ simple:'Uses one shared "shard" matrix that is tiled/replicated to build the full low-rank update  faster to initialize than PiSSA/LoRA-GA.',
+ desc:'MiSS uses a single trainable matrix shared (replicated in shards) to construct the low-rank update, avoiding expensive initialization while achieving fast training throughput.',
+ mech:'Decomposes the weight update into fragment matrices; a single shared trainable fragment is replicated across shards to construct ΔW. Variants: standard (efficient), BAT (nonlinear), MINI (smaller rank on output dim).',
+ formula:'ΔW = tile(shared_shard)   (replicated fragments)',
+ params:'r × in_features for standard MiSS (one shared matrix)'},
+
+{id:'lily', name:'Lily', fullName:'Low-Rank Interconnected Adaptation Across Layers', year:2024, cat:'low-rank',
+ pct:0.3, pctLabel:'~0.05–0.5%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',attn_core:'added'},
+ badge:{q_proj:'shared-A + routed-B',attn_core:'router'},
+ simple:'Shares A matrices across groups of layers and uses a small pool of B "experts" shared globally, with a learned router picking which B to use each forward pass.',
+ desc:'Lily introduces cross-layer parameter sharing: A adapters shared across stride_A consecutive layers; B adapters form a global pool of num_B experts, selected by a data-dependent softmax router.',
+ mech:'Locally shared A: every stride_A adjacent layers share one A matrix. Globally shared B: num_B expert B matrices. Router (learned, input-dependent) produces weights over B experts → weighted combination is the effective B. ΔW = A × (Σᵢ wᵢBᵢ).',
+ formula:"ΔW = A × Σᵢ softmax(router(x))ᵢ · Bᵢ",
+ params:'(N/stride_A)×rk + num_B×dr + router. Much fewer than N×2rd for N layers'},
+
+{id:'c3a', name:'C3A', fullName:'Circular Convolution Adaptation', year:2024, cat:'low-rank',
+ pct:0.3, pctLabel:'~0.05–0.5%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'circ conv',v_proj:'FFT-based'},
+ simple:'Uses circular convolution (efficient via FFT) to represent high-rank weight updates within blocks of the weight matrix.',
+ desc:'C3A applies circular convolution kernels to blocks of weight matrices, achieving high-rank updates with linear (not quadratic) cost in the block dimension. Requires much higher LR than LoRA (~1e-1).',
+ mech:'Weight W partitioned into blocks of size block_size. For each block, a circular convolution kernel of size block_size is learned. Circular convolution = element-wise product in Fourier domain (via FFT). High-rank update, efficient computation.',
+ formula:'ΔW_block = IFFT(FFT(block_kernel) ⊙ FFT(x))',
+ params:'block_size parameters per block vs block_size² for full. Larger block_size = fewer params'},
+
+{id:'tinylora', name:'TinyLoRA', fullName:'Tiny Low-Rank Adaptation', year:2025, cat:'low-rank',
+ pct:0.01, pctLabel:'<0.01% (down to 13 params)',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added'},
+ badge:{q_proj:'v·P (tiny vec)',v_proj:'shared v'},
+ simple:'The most extreme parameter reduction possible: a single tiny vector v controls all adaptation via fixed random projections. Can use just 13 parameters for an 8B model.',
+ desc:'TinyLoRA replaces the trainable R matrix in LoRA-XS with R = Σᵢ vᵢPᵢ, where v ∈ ℝᵘ is a tiny trainable vector and Pᵢ are fixed random matrices. Full weight tying shares v across all layers.',
+ mech:'SVD: W ≈ UΣVᵀ. LoRA-XS uses small trainable R (r×r). TinyLoRA: R = Σᵢ vᵢPᵢ where v is a u-dim trainable vector and Pᵢ are fixed random matrices. Weight tying (0.0–1.0) controls how many layers share v. Works best with RL training (GRPO).',
+ formula:"R = Σᵢ vᵢ·Pᵢ,   ΔW = U·(R-I)·Vᵀ",
+ params:'u per group (e.g. 64). With full tying: just 64 params total for entire model!'},
+
+{id:'peanut', name:'PEANuT', fullName:'Parameter-Efficient Adaptation with Neural Tweakers', year:2024, cat:'low-rank',
+ pct:0.5, pctLabel:'~0.1–2%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'f(W₀)',v_proj:'weight-aware'},
+ simple:'Unlike LoRA which ignores the existing weight, PEANuT conditions the adapter on the frozen weight itself  making the update "aware" of what\'s already stored there.',
+ desc:'PEANuT uses weight-aware neural tweakers: compact nonlinear MLPs that condition the adapter update on the frozen pretrained weight, achieving higher expressivity than linear LoRA adapters.',
+ mech:'For weight W₀: apply projection A (over output dim), then depth encoder layers with ReLU/GELU activations, then decoder layers, then projection B. ΔW = B(enc(dec(A(W₀ᵀ))))ᵀ. Explicitly constructs ΔW before applying (higher memory than LoRA).',
+ formula:"ΔW = B · nonlinear_net(A · W₀ᵀ)ᵀ,   conditioned on W₀",
+ params:'A(r×d_out) + B(r×d_out) + depth×2 hidden layers of rank r. Higher memory due to explicit ΔW'},
+
+// ── PROMPT-BASED ─────────────────────────────────────────────────────────────
+{id:'prompt_tuning', name:'Prompt Tuning', fullName:'Soft Prompt Tuning', year:2021, cat:'prompt',
+ pct:0.05, pctLabel:'~0.001–0.05%',
+ hi:{token_embed:'prompt'},
+ badge:{token_embed:'soft tokens'},
+ simple:'Prepends a handful of learnable "virtual" token embeddings to every input. The entire model is frozen  only these soft prompt vectors are trained.',
+ desc:'Prompt Tuning directly optimizes a matrix of continuous (soft) tokens prepended to each input sequence. The entire pretrained model is frozen; only the soft prompt matrix is updated via backpropagation.',
+ mech:'A matrix P ∈ ℝ^{L×d} of L virtual token embeddings is prepended to every input. The model sees [P; embed(input_tokens)] as its sequence. Only P receives gradients. No architectural changes needed.',
+ formula:'Input = [p₁, p₂, …, p_L, t₁, t₂, …, t_n]   (pᵢ learnable)',
+ params:'L × d_embed. For 10 tokens, d=1024: only 10,240 parameters total'},
+
+{id:'prefix_tuning', name:'Prefix Tuning', fullName:'Prefix-Tuning: Optimizing Continuous Prompts', year:2021, cat:'prompt',
+ pct:0.1, pctLabel:'~0.01–0.2%',
+ hi:{k_proj:'prompt',v_proj:'prompt'},
+ badge:{k_proj:'prefix-K',v_proj:'prefix-V'},
+ simple:'Prepends learnable vectors to the Key and Value of every attention layer  like giving the model extra "memory context" at every level, not just the input.',
+ desc:'Prefix Tuning prepends trainable prefix vectors to the K and V of each attention layer. Base model is fully frozen. A reparameterization MLP stabilizes optimization and is discarded after training.',
+ mech:'For each layer l: K\'_l = [Prefix_K_l ; K_l], V\'_l = [Prefix_V_l ; V_l]. Prefix parameters are generated by a small MLP (reparameterization) during training → discarded at inference, leaving just the prefix K,V tensors.',
+ formula:"K' = [P_K ; K],  V' = [P_V ; V]   (at every layer)",
+ params:'2 × prefix_len × d_model × num_layers. GPT-2 prefix_len=10: ≈1.2M params'},
+
+{id:'cartridges', name:'Cartridges', fullName:'KV-Cache Parameterized Prefix', year:2025, cat:'prompt',
+ pct:0.1, pctLabel:'~0.1–0.5%',
+ hi:{k_proj:'prompt',v_proj:'prompt'},
+ badge:{k_proj:'direct KV',v_proj:'direct KV'},
+ simple:'Stores a learned KV-cache prefix directly  like a "memory cartridge" that gives the model knowledge of a long document without re-reading it.',
+ desc:'Cartridges parametrize the per-layer KV-cache prefix directly (no MLP encoder), initialized from real prefill KV caches. Trained via self-study distillation with a frozen teacher.',
+ mech:'Learns KV prefix directly as parameters. Initialized from actual model prefill on a corpus. First token frozen as attention sink. Self-study: frozen base teacher → student (with cartridge) matches teacher token distribution.',
+ formula:"KV_prefix = learnable tensor [L, p, 2, H, d_h]",
+ params:'prefix_len × num_layers × 2 × num_heads × head_dim. Directly interpretable as KV cache'},
+
+{id:'ptuning', name:'P-tuning', fullName:'P-Tuning: GPT Understands Too', year:2021, cat:'prompt',
+ pct:0.05, pctLabel:'~0.001–0.05%',
+ hi:{token_embed:'prompt'},
+ badge:{token_embed:'LSTM→prompts'},
+ simple:'Generates soft prompts through a small LSTM/MLP encoder rather than directly optimizing the token embeddings, making training more stable.',
+ desc:'P-tuning uses a small LSTM or MLP reparameterization network to generate virtual token embeddings, modeling dependencies between virtual tokens unlike plain Prompt Tuning.',
+ mech:'Virtual token embeddings produced by a trainable encoder (LSTM or MLP): embed = encoder(position). Embeddings are inserted at specific positions in the input. The encoder models inter-token dependencies. Only the encoder is trained.',
+ formula:'p_i = MLP(h_i),   h_i = LSTM(i)',
+ params:'LSTM/MLP encoder params + L×d embeddings. Very few relative to full model'},
+
+{id:'multitask_pt', name:'Multitask PT', fullName:'Multitask Prompt Tuning', year:2023, cat:'prompt',
+ pct:0.05, pctLabel:'~0.001–0.05%',
+ hi:{token_embed:'prompt'},
+ badge:{token_embed:'shared+task'},
+ simple:'Learns a single shared soft prompt that works across multiple tasks by combining a shared base prompt with tiny task-specific modifiers.',
+ desc:'Multitask Prompt Tuning decomposes task-specific prompts as multiplicative combinations of a shared prompt matrix and low-rank task-specific vectors, enabling cross-task knowledge sharing.',
+ mech:'Shared prompt W_s is learned once. Task-specific modification: W_t = u_t·v_tᵀ (rank-1). Effective prompt for task t: W_s + u_t·v_tᵀ. Only W_s and the rank-1 components are trained.',
+ formula:"prompt_t = W_s + u_t · v_tᵀ",
+ params:'L×d (shared) + 2d per task (u,v rank-1). For 8 tasks: slightly more than single prompt tuning'},
+
+{id:'cpt', name:'CPT', fullName:'Context-Aware Prompt Tuning', year:2024, cat:'prompt',
+ pct:0.04, pctLabel:'~0.001–0.05%',
+ hi:{token_embed:'prompt'},
+ badge:{token_embed:'adversarial'},
+ simple:'Combines few-shot examples with soft prompts and uses adversarial-style optimization to make the prompt more robust, preventing overfitting on small datasets.',
+ desc:'CPT combines ICL (few-shot examples in context) with Prompt Tuning, adding adversarial perturbations and projected gradient descent to refine context embeddings.',
+ mech:'Concatenates few-shot examples before input (like ICL), then adds trainable delta tokens. Projected gradient descent updates specific context token embeddings with an ε-constraint keeping them close to original values.',
+ formula:"embed' = embed + δ,  ‖δ‖ ≤ ε  (projected GD)",
+ params:'num_context_tokens × d_embed. Same as prompt tuning but with adversarial optimization loop'},
+
+{id:'trainable_tokens', name:'Trainable Tokens', fullName:'Trainable Token Embeddings', year:2024, cat:'prompt',
+ pct:0.01, pctLabel:'~0.001%',
+ hi:{token_embed:'trainable'},
+ badge:{token_embed:'selected rows'},
+ simple:'Makes only specific token rows in the embedding table trainable (e.g., newly added vocabulary tokens), while all other rows stay frozen.',
+ desc:'Trainable Tokens selectively fine-tunes specific token embedding rows without retraining the full embedding matrix. Ideal for adding new vocabulary tokens or fine-tuning special tokens.',
+ mech:'A sparse gradient mask is applied to the embedding table: only specified token indices receive gradient updates. Typically used after tokenizer.add_tokens() to train new vocabulary embeddings. Compatible with LoRA layers simultaneously.',
+ formula:'grad[embed] masked to selected_token_indices only',
+ params:'num_trainable_tokens × d_embed. For 10 new tokens, d=4096: only 40,960 params total'},
+
+{id:'llama_adapter', name:'Llama-Adapter', fullName:'Llama-Adapter: Zero-Init Attention Prefix', year:2023, cat:'prompt',
+ pct:0.02, pctLabel:'~0.01%',
+ hi:{token_embed:'prompt',q_proj:'added',attn_core:'added'},
+ badge:{token_embed:'prefix tokens',attn_core:'zero gate'},
+ simple:'Adds learnable prefix tokens to the top N transformer layers only, with a special "zero gate" that prevents disturbing the pretrained model early in training.',
+ desc:'Llama-Adapter prepends L learnable adaptation tokens to the top N attention layers. A zero-initialized gating factor prevents distortion of pretrained knowledge at the start of training.',
+ mech:'For top N layers: K\' = [Prefix_K ; K], V\' = [Prefix_V ; V]. A learnable gate scalar g (initialized to 0) modulates the prefix contribution: attention uses tanh(g) × prefix_attention + regular_attention. Gate grows slowly during training.',
+ formula:"attn' = tanh(g)·softmax(Q·[P_K;K]ᵀ)·[P_V;V] + softmax(QKᵀ)·V",
+ params:'L×d×2×N (prefix K,V) + N scalars (gates). For L=10, N=32, d=4096: ≈2.6M params'},
+
+// ── ORTHOGONAL ────────────────────────────────────────────────────────────────
+{id:'oft', name:'OFT', fullName:'Orthogonal Fine-Tuning', year:2023, cat:'orthogonal',
+ pct:0.5, pctLabel:'~0.1–2%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'R·W (RᵀR=I)',v_proj:'orthogonal R'},
+ simple:'Learns an orthogonal transformation matrix R (like a pure "rotation" of the weights) that preserves the angles between all weight vectors while adapting the model.',
+ desc:'OFT fine-tunes by learning orthogonal transformation matrices (RᵀR=I) applied to weight matrices. Orthogonal transformations preserve pairwise angles between neurons, maintaining the pretrained hyperspherical energy.',
+ mech:'Adapted weight: W\' = R · W₀. R is an orthogonal matrix parameterized via Cayley map: R = (I+Q)(I-Q)⁻¹ where Q is skew-symmetric. At inference, R·W₀ can be precomputed. Only Q is trained.',
+ formula:"W' = R·W₀,  R = (I+Q)(I-Q)⁻¹,  Q skew-symmetric",
+ params:'d² per layer (without block structure). Block OFT reduces to O(d·b) for block size b'},
+
+{id:'boft', name:'BOFT', fullName:'Block Orthogonal Fine-Tuning', year:2023, cat:'orthogonal',
+ pct:0.3, pctLabel:'~0.05–0.5%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'butterfly R',v_proj:'block-diag'},
+ simple:'Like OFT but uses a "butterfly" structure of block-diagonal orthogonal matrices  dramatically fewer parameters while maintaining the orthogonality property.',
+ desc:'BOFT approximates a full orthogonal matrix as a product of sparse block-diagonal orthogonal matrices arranged in a butterfly pattern, reducing parameter count from O(d²) to O(d·b·m).',
+ mech:'R = Rₘ × Rₘ₋₁ × ... × R₁ where each Rᵢ is a block-diagonal matrix of small (b×b) orthogonal blocks in butterfly permutation order. Total parameters: d·b·m vs d² for full OFT.',
+ formula:"R = Π Rᵢ (butterfly product of block-diag orthogonals)",
+ params:'b² × (d/b) × num_butterfly_factor. For d=4096, b=4, m=4: ≈65K vs d²=16M for full OFT'},
+
+{id:'psoft', name:'PSOFT', fullName:'Orthogonal FT with Principal Subspace', year:2025, cat:'orthogonal',
+ pct:0.3, pctLabel:'~0.05–0.5%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'A·R·B + W_res',v_proj:'principal sub'},
+ simple:'Restricts OFT\'s orthogonal transformation to only the "important" subspace of the pretrained weight (found by SVD), ignoring the less important directions.',
+ desc:'PSOFT confines orthogonal transformations to the principal SVD subspace of pretrained weights, bridging LoRA and OFT with theoretical guarantees and practical efficiency.',
+ mech:'SVD: W_pre = USVᵀ. Principal part: W_pri = U_r S_r V_rᵀ = AB (frozen). Residual: W_res (frozen). Only r×r orthogonal R (and optional diagonal scalars α,β) are trained: W\' = A·R·B + W_res.',
+ formula:"W' = A·diag(α)·R·diag(β)·B + W_res,  R orthogonal",
+ params:'r² for R matrix (strict OFT), + 2r for relaxed variant with α,β vectors'},
+
+{id:'hra', name:'HRA', fullName:'Householder Reflection Adaptation', year:2024, cat:'orthogonal',
+ pct:0.2, pctLabel:'~0.02–0.3%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'Π Householder',v_proj:'H₁H₂…Hₘ'},
+ simple:'Builds the orthogonal transformation matrix out of simple "mirror reflections" (Householder reflections), each defined by a single vector  extremely parameter efficient.',
+ desc:'HRA constructs orthogonal transformation matrices as a product of Householder reflections, each parameterized by a single unit vector. Very parameter efficient while producing high-quality orthogonal matrices.',
+ mech:'R = H₁H₂...Hₘ where Hᵢ = I - 2uᵢuᵢᵀ is a Householder reflection (mirror over the hyperplane perpendicular to uᵢ). Each uᵢ ∈ ℝᵈ is a learnable unit vector.',
+ formula:"Hᵢ = I - 2·uᵢ·uᵢᵀ,  ‖uᵢ‖=1,  R = Π Hᵢ",
+ params:'m × d per layer. For m=8, d=4096: 32,768 per layer. Much less than d²=16.7M for full OFT'},
+
+{id:'road', name:'RoAd', fullName:'Rotation-Based Adapter', year:2024, cat:'orthogonal',
+ pct:0.1, pctLabel:'<0.1%',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added'},
+ badge:{q_proj:'2×2 rotations',v_proj:'θ,scale'},
+ simple:'Applies tiny 2×2 rotation matrices to pairs of hidden dimensions  reformulated as simple element-wise operations for extremely fast multi-adapter serving.',
+ desc:'RoAd adapts models by learning 2D rotation angles and scaling factors applied to pairs of hidden dimensions. Enables 5–16× faster adapter switching than LoRA fusion.',
+ mech:'Groups hidden dims into pairs. Learns angle θ and scale s for each pair. The 2D rotation [cos θ, -sin θ; sin θ, cos θ] simplifies to element-wise ops. Three variants: road_1 (shared per layer), road_2 (per element), road_4 (two per element).',
+ formula:"[y₁,y₂] = s·[cosθ·x₁ - sinθ·x₂,  sinθ·x₁ + cosθ·x₂]",
+ params:'road_1: d_out per layer. road_2: 2×d_out. road_4: 4×d_out. All <0.1% total'},
+
+// ── SPARSE / SUBSPACE ─────────────────────────────────────────────────────────
+{id:'osf', name:'OSF', fullName:'Orthogonal Subspace Fine-Tuning', year:2025, cat:'sparse',
+ pct:50, pctLabel:'~50% (no extra params)',
+ hi:{q_proj:'masked',k_proj:'masked',v_proj:'masked',o_proj:'masked',ffn_up:'masked',ffn_down:'masked'},
+ badge:{q_proj:'⊥ frozen subspace',v_proj:'orthogonal proj'},
+ simple:'For continual learning: trains weight updates that are mathematically "perpendicular" to what was learned on previous tasks, so new knowledge doesn\'t erase old knowledge.',
+ desc:'OSF enables full fine-tuning while preventing catastrophic forgetting by constraining weight updates to be orthogonal to directions critical for previous tasks. No extra parameters.',
+ mech:'SVD: W = U_high·Σ_high·V_highᵀ + U_low·Σ_low·V_lowᵀ. High-rank part (top k singular vectors) preserved from previous tasks  frozen. Low-rank part trainable. Gradients projected to be ⊥ to high-rank space. Between tasks: k increases.',
+ formula:"grad_proj = grad - U_high·U_highᵀ·grad  (orthogonal projection)",
+ params:'No new parameters. Trainable count = model_params × (1 - effective_rank/min_dim)'},
+
+{id:'shira', name:'SHiRA', fullName:'Sparse High-Rank Adaptation', year:2024, cat:'sparse',
+ pct:1.0, pctLabel:'~1–2% (sparse)',
+ hi:{q_proj:'masked',k_proj:'masked',v_proj:'masked',o_proj:'masked',ffn_up:'masked',ffn_down:'masked'},
+ badge:{q_proj:'1–2% sparse',v_proj:'direct weights'},
+ simple:'Directly fine-tunes 1–2% of the original weight values (selected by a random sparse mask)  unlike LoRA which adds new matrices, SHiRA is high-rank by design.',
+ desc:'SHiRA fine-tunes only 1–2% of base model weights via a sparse mask, resulting in inherently high-rank updates. Enables rapid adapter switching (5–16× faster than LoRA) without merging overhead.',
+ mech:'For weight W ∈ ℝ^{m×n}: a random binary mask M selects r(m+n) positions (1–2% of m×n). Only selected W[mask] entries are trained; others frozen. The sparse delta can be added/removed without recomputing fused weights.',
+ formula:"ΔW = M ⊙ δ,  δ trained,  sparsity ~1%",
+ params:'r(m+n) per layer ≈ 1-2% of weight count. Same count as LoRA r but truly sparse and high-rank'},
+
+// ── MIXTURE / MULTI-TASK ──────────────────────────────────────────────────────
+{id:'xlora', name:'X-LoRA', fullName:'Mixture of LoRA Experts', year:2024, cat:'mixture',
+ pct:0.5, pctLabel:'~0.1–2% per LoRA',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',attn_core:'added'},
+ badge:{q_proj:'N LoRA experts',attn_core:'router'},
+ simple:'Loads multiple LoRA adapters simultaneously and uses a learned router to mix them dynamically based on each input  like a team of specialists where the router picks who speaks.',
+ desc:'X-LoRA maintains multiple pre-trained LoRA adapters and a learned routing classifier that dynamically weights their contributions per token/layer. Only the router is trained during X-LoRA training.',
+ mech:'N LoRA adapters loaded per layer (all frozen). A frozen router/scaling head scores each input and computes softmax weights. Output: W₀x + Σₙ wₙ·Bₙ·Aₙ·x. During training, only the router parameters are updated.',
+ formula:"h = W₀x + Σₙ softmax(router(x))ₙ · Bₙ·Aₙ·x",
+ params:'N × LoRA_params (frozen) + routing classifier (trained only during X-LoRA phase)'},
+
+{id:'polytropon', name:'Polytropon', fullName:'Modular Mixture of Adapters', year:2022, cat:'mixture',
+ pct:0.5, pctLabel:'~0.5–2%',
+ hi:{q_proj:'added',v_proj:'added',ffn_up:'added',ffn_down:'added',attn_core:'added'},
+ badge:{q_proj:'K adapter lib',attn_core:'task routing'},
+ simple:'Maintains a library of K adapters per layer. For each task, a learned assignment picks which adapters to combine  adapters can be shared and reused across tasks.',
+ desc:'Polytropon learns a library of K adapter modules per layer, plus a routing policy (assignment matrix Z per task) that combines adapters. Enables modular multi-task learning with shared components.',
+ mech:'K adapters per layer: {A₁,B₁}, …, {Aₖ,Bₖ}. Task t uses assignment Z[t] ∈ ℝᴷ to combine: ΔW_t = Σᵢ Z[t,i] · BᵢAᵢ. Z can be soft (weighted avg) or hard (straight-through). Jointly trained with task data.',
+ formula:"ΔW_t = Σᵢ z_{t,i} · Bᵢ·Aᵢ",
+ params:'K × 2rd per layer + assignment matrix Z per task. Amortizes adapter cost across T tasks'},
+
+{id:'lycoris', name:'LyCORIS', fullName:'Versatile Adapter Framework', year:2023, cat:'mixture',
+ pct:0.5, pctLabel:'Varies by inner method',
+ hi:{q_proj:'added',k_proj:'added',v_proj:'added',o_proj:'added',ffn_up:'added',ffn_down:'added'},
+ badge:{q_proj:'multi-algo',v_proj:'LoHa/LoKr/…'},
+ simple:'A collection framework that unifies many different weight decomposition methods (LoKr, LoHa, full Tucker, etc.) under one interface  mix and match strategies.',
+ desc:'LyCORIS is a unified framework providing interchangeable LoRA-like decomposition methods: LoKr (Kronecker), LoHa (Hadamard), Diag-OFT, full-matrix Tucker decomposition, and more.',
+ mech:'Implements multiple weight decomposition strategies that all follow the same PEFT interface. Allows experimenting with different algebraic structures (Kronecker, Hadamard, Tucker) using the same training code and model.',
+ formula:'ΔW = method(A, B, …)   (method = LoKr/LoHa/Tucker/…)',
+ params:'Varies: LoKr ~(m+n+p+q), LoHa ~4r(d+k), full Tucker ~d+k+r'},
+
+// ── ACTIVATION / BIAS ─────────────────────────────────────────────────────────
+{id:'ia3', name:'IA³', fullName:'Infused Adapter by Inhibiting and Amplifying Inner Activations', year:2022, cat:'activation',
+ pct:0.02, pctLabel:'~0.01–0.02%',
+ hi:{k_proj:'trainable',v_proj:'trainable',ffn_act:'trainable'},
+ badge:{k_proj:'scale lₖ',v_proj:'scale lᵥ',ffn_act:'scale lₗ'},
+ simple:'Adds only three tiny scaling vectors per transformer block  one for keys, one for values, one for FFN hidden states. Incredibly efficient while surprisingly effective.',
+ desc:'IA³ learns three element-wise scaling vectors per transformer block: lₖ for key activations, lᵥ for value activations, and lₗ for FFN intermediate activations. All pretrained weights are frozen.',
+ mech:'K scaled: K\' = lₖ ⊙ K. V scaled: V\' = lᵥ ⊙ V. FFN hidden: h\' = lₗ ⊙ FFN_hidden. Each lₖ,lᵥ ∈ ℝᵈ, lₗ ∈ ℝ^{4d}. At inference, scale vectors can be merged into corresponding weight matrices.',
+ formula:"K' = l_k ⊙ K,  V' = l_v ⊙ V,  h' = l_ff ⊙ h",
+ params:'3 vectors per block × hidden_dim ≈ 0.01%. For T5-XL: 1.7M (0.006%)'},
+
+{id:'layernorm', name:'Layernorm Tuning', fullName:'LayerNorm Parameter Fine-Tuning', year:2023, cat:'activation',
+ pct:0.05, pctLabel:'~0.03–0.05%',
+ hi:{ln1:'trainable',ln2:'trainable',final_ln:'trainable'},
+ badge:{ln1:'γ, β trained',ln2:'γ, β trained',final_ln:'γ, β trained'},
+ simple:'Only trains the gain (γ) and bias (β) parameters inside the LayerNorm layers. Everything else  all attention and FFN weights  stays frozen.',
+ desc:'Layernorm Tuning freezes all weight matrices and only updates the learnable scale (γ) and shift (β) parameters of every LayerNorm layer. Surprisingly effective for distribution shift adaptation.',
+ mech:'LayerNorm: y = γ·(x − μ)/σ + β. Standard operation with γ,β typically initialized to 1,0. Only γ and β are unfrozen. Each LayerNorm has 2×d parameters. Very fast training, minimal memory overhead.',
+ formula:'y = γ ⊙ ((x - μ)/σ) + β,   only γ, β have grad',
+ params:'2 × d_model × (2×num_layers + 1). For LLaMA-7B: ≈2M (0.03%)'},
+
+{id:'beft', name:'BEFT', fullName:'Bias-Efficient Fine-Tuning', year:2025, cat:'activation',
+ pct:0.02, pctLabel:'~0.001–0.005%',
+ hi:{v_proj:'trainable'},
+ badge:{v_proj:'bias only bᵥ'},
+ simple:'Only adds and trains a bias vector to the Value (V) projection in attention. Nothing else changes. Surprisingly competitive in low-data settings.',
+ desc:'BEFT fine-tunes only the added bias terms of Value (V) projections. Research shows bᵥ (bias on V) consistently outperforms bq (Q bias) and bk (K bias) for downstream tasks in low-data regimes.',
+ mech:'For V projection: V_output = W_v·x + b_v where only b_v is trainable. W_v and all other parameters frozen. The bias shift in V directly shifts the attended value content without changing the attention pattern.',
+ formula:"V' = W_v·x + b_v,   only b_v trained (W_v frozen)",
+ params:'d_model per V projection × num_layers. 32-layer, d=4096 model: only 131K params total'},
+];
+
+// ── Build sidebar ─────────────────────────────────────────────────────────────
+const catMap = {};
+ADAPTERS.forEach(a => { if(!catMap[a.cat]) catMap[a.cat]=[]; catMap[a.cat].push(a); });
+const list = document.getElementById('adapterList');
+CATS.forEach(c => {
+  const adapters = catMap[c.id] || [];
+  if(!adapters.length) return;
+  const lbl = document.createElement('div');
+  lbl.className='cat-label'; lbl.textContent=c.label; list.appendChild(lbl);
+  adapters.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className='abtn'; btn.id=`btn-${a.id}`; btn.dataset.id=a.id;
+    btn.innerHTML=`<span class="dot d-${a.cat}"></span>${a.name}`;
+    btn.onclick=()=>selectAdapter(a.id);
+    list.appendChild(btn);
+  });
+});
+
+function filterAdapters(q) {
+  const lc = q.toLowerCase();
+  document.querySelectorAll('.abtn').forEach(btn => {
+    btn.classList.toggle('hidden', !btn.textContent.toLowerCase().includes(lc));
+  });
+}
+
+const ALL_IDS = ['token_embed','ln1','q_proj','k_proj','v_proj','attn_core','o_proj','ln2','ffn_up','ffn_act','ffn_down','final_ln','lm_head'];
+
+function clearStates() {
+  ALL_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.className='tc';
+    if(id==='token_embed') el.className='tc'; // keep custom class if any
+    el.querySelectorAll('.tc-badge').forEach(b=>b.remove());
+  });
+}
+
+function selectAdapter(id) {
+  clearStates();
+  document.querySelectorAll('.abtn').forEach(b=>b.classList.toggle('active', b.dataset.id===id));
+  const A = ADAPTERS.find(a=>a.id===id);
+  if(!A) return;
+  // Auto-close sidebar on mobile after selection
+  if(window.innerWidth<=820) closeSidebar();
+
+  // Frozen everything not in hi
+  ALL_IDS.filter(lid=>!A.hi[lid]).forEach(lid=>{
+    const el=document.getElementById(lid);
+    if(el) el.classList.add('s-frozen');
+  });
+
+  // Apply states + badges
+  Object.entries(A.hi).forEach(([lid, state])=>{
+    const el=document.getElementById(lid);
+    if(!el) return;
+    el.classList.add(`s-${state}`);
+    if(A.badge && A.badge[lid]){
+      const b=document.createElement('span');
+      b.className='tc-badge';
+      const colors={added:'#059669',trainable:'#D97706',prompt:'#7C3AED',masked:'#DC2626'};
+      b.style.background=colors[state]||'#059669';
+      b.style.color='#fff';
+      b.textContent=A.badge[lid];
+      el.appendChild(b);
+    }
+  });
+
+  renderInfo(A);
+}
+
+function renderInfo(A){
+  const panel=document.getElementById('infoPanel');
+  const catColors={
+    'low-rank':'c-low-rank','prompt':'c-prompt','orthogonal':'c-orthogonal',
+    'sparse':'c-sparse','mixture':'c-mixture','activation':'c-activation'
+  };
+  const catLabels={
+    'low-rank':'Low-Rank','prompt':'Prompt-Based','orthogonal':'Orthogonal',
+    'sparse':'Sparse / Subspace','mixture':'Mixture','activation':'Activation / Bias'
+  };
+
+  const stateColors={frozen:'var(--frozen-bd)',trainable:'var(--train-bd)',added:'var(--added-bd)',prompt:'var(--prompt-bd)',masked:'var(--masked-bd)'};
+  const stateLabels={frozen:'Frozen',trainable:'Trainable',added:'Added adapter',prompt:'Prompt / Prefix',masked:'Sparse / Selected'};
+
+  const affHtml=Object.entries(A.hi).map(([lid,state])=>`
+    <div class="aff-item">
+      <div class="aff-dot" style="background:${stateColors[state]}"></div>
+      ${LAYER_NAMES[lid]||lid}
+      <span style="color:${stateColors[state]};font-weight:600;margin-left:2px"> ${stateLabels[state]}</span>
+    </div>`).join('');
+
+  const pctDisp=Math.min(A.pct,5);
+  const fillPct=(pctDisp/5)*100;
+  const barColor=A.pct<=0.05?'#059669':A.pct<=0.5?'#1B1464':A.pct<=2?'#D97706':'#DC2626';
+
+  panel.innerHTML=`
+    <div>
+      <div class="info-name">${A.name}</div>
+      <div class="info-fn">${A.fullName}</div>
+      <div class="info-meta">
+        <span class="mtag" style="background:var(--bg-deep);color:var(--fg-muted)">📅 ${A.year}</span>
+        <span class="mtag ${catColors[A.cat]}">${catLabels[A.cat]}</span>
+      </div>
+    </div>
+
+    <div class="isec">
+      <h3> What it does</h3>
+      <div class="idesc">${A.simple}</div>
+    </div>
+
+    <div class="isec">
+      <h3>How it works</h3>
+      <div class="idesc">${A.desc}</div>
+      <div class="formula">${A.formula}</div>
+      <div class="idesc">${A.mech}</div>
+    </div>
+
+    <div class="isec">
+      <h3>Parameter Efficiency</h3>
+      <div class="pbar-wrap">
+        <div class="pbar-labels"><span>Trainable params</span><span>${A.pctLabel} of model</span></div>
+        <div class="pbar">
+          <div class="pbar-fill" style="width:${fillPct}%;background:${barColor}"></div>
+        </div>
+      </div>
+      <div class="pdetail">
+        <strong>Example:</strong> ${A.params}<br>
+        <strong>Reference:</strong> Full fine-tuning = 100% of model params
+      </div>
+    </div>
+
+    <div class="isec">
+      <h3>Affected Layers</h3>
+      <div class="aff-list">${affHtml}</div>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
